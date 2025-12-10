@@ -1,7 +1,7 @@
 // page.tsx
 
-import AuthLayout from '@/components/auth/AuthLayout'
-import LoginForm from '@/components/auth/LoginForm'
+import AuthLayout from '../_components/AuthLayout'
+import LoginForm from '../_components/LoginForm'
 
 export default function LoginPage() {
   return (

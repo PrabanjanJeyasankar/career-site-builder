@@ -38,9 +38,7 @@ export interface LifeSection {
   heading: string | null
   description_primary: string | null
   description_secondary: string | null
-  image_1_url: string | null
-  image_2_url: string | null
-  image_3_url: string | null
+  image_url: string | null
   updated_at: string
 }
 

@@ -1,7 +1,7 @@
 'use client'
 
+import Logo from '@/components/common/Logo'
 import type { ReactNode } from 'react'
-import Logo from '../common/Logo'
 
 interface AuthLayoutProps {
   description: string

@@ -1,17 +1,14 @@
-// editor/page.tsx
-import {
-  EditorPageClient,
-  type HeroEditorInitialData,
-} from './_components/editor-page-client'
+// preview/page.tsx
+import { PreviewPageClient } from '@/app/(editor)/editor/_components/preview-page-client'
 
 import { getCurrentCompanyName } from '@/lib/db/company'
 import {
   getCompanyProfileForCurrentCompany,
   getLifeSectionForCurrentCompany,
 } from '@/lib/db/fetchSectionData'
-import { LifeSection } from '@/types/database'
+import type { LifeSection } from '@/types/database'
 
-export default async function EditorPage() {
+export default async function PreviewPage() {
   const [companyResult, profileResult, lifeResult] = await Promise.allSettled([
     getCurrentCompanyName(),
     getCompanyProfileForCurrentCompany(),
@@ -20,7 +17,6 @@ export default async function EditorPage() {
 
   const companyName =
     companyResult.status === 'fulfilled' ? companyResult.value : 'Your company'
-
   const profile =
     profileResult.status === 'fulfilled' ? profileResult.value : null
 
@@ -36,7 +32,7 @@ export default async function EditorPage() {
           updated_at: '',
         }
 
-  const heroData: HeroEditorInitialData = {
+  const heroData = {
     companyName,
     logoUrl: profile?.logo_url ?? '',
     heroTitle:
@@ -53,5 +49,5 @@ export default async function EditorPage() {
     primaryColor: profile?.primary_color ?? '#059669',
   }
 
-  return <EditorPageClient heroData={heroData} lifeData={life} />
+  return <PreviewPageClient heroData={heroData} lifeData={life} />
 }

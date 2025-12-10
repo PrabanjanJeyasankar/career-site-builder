@@ -17,6 +17,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar'
+import { Separator } from '@radix-ui/react-separator'
 
 interface NavUserProps {
   user: {
@@ -82,7 +83,7 @@ export function NavUser({ user }: NavUserProps) {
                 </div>
               </div>
             </DropdownMenuLabel>
-
+            <Separator className='my-1 h-px bg-muted' />
             <DropdownMenuItem onClick={handleLogout} className='cursor-pointer'>
               <LogOut />
               Log out

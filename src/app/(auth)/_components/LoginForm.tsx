@@ -16,6 +16,7 @@ import { loginSchema, type LoginSchema } from '@/lib/validation/authSchema'
 
 export default function LoginForm({ className }: { className?: string }) {
   const [serverError, setServerError] = useState('')
+  const [isLoggingIn, setIsLoggingIn] = useState(false)
 
   const {
     register,
@@ -28,15 +29,27 @@ export default function LoginForm({ className }: { className?: string }) {
   async function onSubmit(data: LoginSchema, event?: React.BaseSyntheticEvent) {
     event?.preventDefault()
 
+    if (isLoggingIn) return
+
     setServerError('')
-    const result = await loginAction(data.email, data.password)
+    setIsLoggingIn(true)
 
-    if (result?.error) {
-      setServerError(result.error)
-      return
+    try {
+      const result = await loginAction(data.email, data.password)
+
+      // If login is successful, redirect to editor
+      if (result?.success) {
+        window.location.assign('/editor')
+        return
+      }
+    } catch (error) {
+      setIsLoggingIn(false)
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'An unexpected error occurred. Please try again.'
+      setServerError(errorMessage)
     }
-
-    window.location.assign('/')
   }
 
   return (
@@ -67,8 +80,11 @@ export default function LoginForm({ className }: { className?: string }) {
             {...register('password')}
           />
 
-          <Button type='submit' disabled={isSubmitting} className='mt-2 w-full'>
-            {isSubmitting ? 'Signing in...' : 'Sign in'}
+          <Button
+            type='submit'
+            disabled={isSubmitting || isLoggingIn}
+            className='mt-2 w-full'>
+            {isSubmitting || isLoggingIn ? 'Signing in...' : 'Sign in'}
           </Button>
         </FieldGroup>
       </form>

@@ -1,7 +1,8 @@
+// loginAction.ts
 'use server'
 
 import { createSupabaseServerClientForActions } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
+import { revalidatePath } from 'next/cache'
 
 export async function loginAction(email: string, password: string) {
   const supabase = await createSupabaseServerClientForActions()
@@ -11,11 +12,16 @@ export async function loginAction(email: string, password: string) {
     password,
   })
 
-  if (error) return { error: error.message }
-
-  if (!data.user) {
-    return { error: 'Login failed - no user data returned' }
+  if (error) {
+    throw new Error(error.message)
   }
 
-  redirect('/')
+  if (!data.user) {
+    throw new Error('Login failed - no user data received')
+  }
+
+  // Revalidate the page to update authentication state
+  revalidatePath('/', 'layout')
+
+  return { success: true }
 }

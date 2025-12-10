@@ -1,16 +1,15 @@
-// company.ts
 'use server'
 
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import type { CompanyUser } from '@/types/database'
 
-const supabasePromise = createSupabaseServerClient()
-
 export async function getCurrentUserCompanyId(): Promise<string> {
-  const supabase = await supabasePromise
+  const supabase = await createSupabaseServerClient()
+
   const {
     data: { user },
   } = await supabase.auth.getUser()
+
   if (!user) throw new Error('User not authenticated')
 
   const { data } = await supabase
@@ -20,14 +19,17 @@ export async function getCurrentUserCompanyId(): Promise<string> {
     .single()
 
   if (!data) throw new Error('User is not associated with any company')
+
   return data.company_id
 }
 
 export async function getCurrentCompanyUser(): Promise<CompanyUser> {
-  const supabase = await supabasePromise
+  const supabase = await createSupabaseServerClient()
+
   const {
     data: { user },
   } = await supabase.auth.getUser()
+
   if (!user) throw new Error('User not authenticated')
 
   const { data } = await supabase
@@ -37,6 +39,7 @@ export async function getCurrentCompanyUser(): Promise<CompanyUser> {
     .single()
 
   if (!data) throw new Error('User is not associated with a company')
+
   return data as CompanyUser
 }
 
@@ -52,7 +55,7 @@ export async function hasRole(
 }
 
 export async function getCurrentCompanyName(): Promise<string> {
-  const supabase = await supabasePromise
+  const supabase = await createSupabaseServerClient()
   const companyId = await getCurrentUserCompanyId()
 
   const { data } = await supabase
@@ -62,5 +65,6 @@ export async function getCurrentCompanyName(): Promise<string> {
     .single()
 
   if (!data) throw new Error('Company not found')
+
   return data.name
 }
