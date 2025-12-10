@@ -72,6 +72,14 @@ export default function LoginForm({ className }: { className?: string }) {
           </Button>
         </FieldGroup>
       </form>
+
+      <div className='text-center text-sm text-muted-foreground'>
+        <a
+          href='/debug-auth'
+          className='text-primary underline underline-offset-4 hover:opacity-80'>
+          Debug Auth State
+        </a>
+      </div>
     </motion.div>
   )
 }
