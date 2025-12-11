@@ -68,3 +68,22 @@ export async function getCurrentCompanyName(): Promise<string> {
 
   return data.name
 }
+
+export async function getCompanyNameById(
+  companyId: string
+): Promise<string | null> {
+  const supabase = await createSupabaseServerClient()
+
+  const { data, error } = await supabase
+    .from('companies')
+    .select('name')
+    .eq('id', companyId)
+    .maybeSingle()
+
+  if (error) {
+    console.error('Failed to fetch company name by id', error)
+    return null
+  }
+
+  return data?.name ?? null
+}

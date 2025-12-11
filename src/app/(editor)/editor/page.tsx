@@ -4,7 +4,7 @@ import {
   type HeroEditorInitialData,
 } from './_components/editor-page-client'
 
-import { getCurrentCompanyName } from '@/lib/db/company'
+import { getCurrentCompanyName, getCurrentUserCompanyId } from '@/lib/db/company'
 import {
   getCompanyProfileForCurrentCompany,
   getJobsForCurrentCompany,
@@ -79,7 +79,11 @@ export default async function EditorPage() {
     heroCtaLabel: profile?.hero_cta_label ?? 'View jobs',
     heroBackgroundUrl: profile?.hero_background_url ?? '',
     primaryColor: profile?.primary_color ?? '#059669',
+    secondaryColor: profile?.secondary_color ?? '#f5f5f5',
   }
+
+  const companyId = await getCurrentUserCompanyId()
+  const previewUrl = `/preview/${companyId}`
 
   return (
     <EditorPageClient
@@ -90,6 +94,7 @@ export default async function EditorPage() {
       locationsData={locations}
       perksData={perks}
       jobsData={jobs}
+      previewUrl={previewUrl}
     />
   )
 }

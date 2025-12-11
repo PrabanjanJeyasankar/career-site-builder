@@ -140,3 +140,135 @@ export async function getJobsForCurrentCompany(): Promise<Job[]> {
 
   return data as Job[]
 }
+
+// Public, company-id based fetchers used by the unauthenticated preview page.
+
+export async function getCompanyProfileByCompanyId(
+  companyId: string
+): Promise<CompanyProfile | null> {
+  const supabase = await createSupabaseServerClient()
+
+  const { data, error } = await supabase
+    .from('company_profile')
+    .select('*')
+    .eq('company_id', companyId)
+    .maybeSingle()
+
+  if (error && error.code !== 'PGRST116') {
+    console.error('Failed to fetch company profile by id', error)
+    throw new Error('Unable to load company profile')
+  }
+
+  return (data as CompanyProfile) ?? null
+}
+
+export async function getLifeSectionByCompanyId(
+  companyId: string
+): Promise<LifeSection | null> {
+  const supabase = await createSupabaseServerClient()
+
+  const { data, error } = await supabase
+    .from('life_section')
+    .select('*')
+    .eq('company_id', companyId)
+    .maybeSingle()
+
+  if (error) {
+    console.error('Failed to fetch life section by id', error)
+    return null
+  }
+
+  return (data as LifeSection) ?? null
+}
+
+export async function getTestimonialsByCompanyId(
+  companyId: string
+): Promise<Testimonial[]> {
+  const supabase = await createSupabaseServerClient()
+
+  const { data, error } = await supabase
+    .from('testimonials')
+    .select('*')
+    .eq('company_id', companyId)
+    .order('order_index', { ascending: true })
+
+  if (error) {
+    console.error('Failed to fetch testimonials by id', error)
+    return []
+  }
+
+  return (data as Testimonial[]) ?? []
+}
+
+export async function getValueItemsByCompanyId(
+  companyId: string
+): Promise<ValueItem[]> {
+  const supabase = await createSupabaseServerClient()
+
+  const { data, error } = await supabase
+    .from('value_items')
+    .select('*')
+    .eq('company_id', companyId)
+    .order('order_index', { ascending: true })
+
+  if (error) {
+    console.error('Failed to fetch value items by id', error)
+    return []
+  }
+
+  return (data as ValueItem[]) ?? []
+}
+
+export async function getLocationsByCompanyId(
+  companyId: string
+): Promise<Location[]> {
+  const supabase = await createSupabaseServerClient()
+
+  const { data, error } = await supabase
+    .from('locations')
+    .select('*')
+    .eq('company_id', companyId)
+    .order('order_index', { ascending: true })
+
+  if (error) {
+    console.error('Failed to fetch locations by id', error)
+    return []
+  }
+
+  return (data as Location[]) ?? []
+}
+
+export async function getPerksByCompanyId(
+  companyId: string
+): Promise<Perk[]> {
+  const supabase = await createSupabaseServerClient()
+
+  const { data, error } = await supabase
+    .from('perks')
+    .select('*')
+    .eq('company_id', companyId)
+
+  if (error) {
+    console.error('Failed to fetch perks by id', error)
+    return []
+  }
+
+  return (data as Perk[]) ?? []
+}
+
+export async function getJobsByCompanyId(companyId: string): Promise<Job[]> {
+  const supabase = await createSupabaseServerClient()
+
+  const { data, error } = await supabase
+    .from('jobs')
+    .select('*')
+    .eq('company_id', companyId)
+    .order('posted_at', { ascending: false })
+
+  if (error) {
+    console.error('Failed to fetch jobs by id', error)
+    return []
+  }
+
+  return (data as Job[]) ?? []
+}

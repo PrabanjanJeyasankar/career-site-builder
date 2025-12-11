@@ -128,9 +128,7 @@ export function LifeSectionEditor({ initial }: EditorProps) {
       </div>
 
       <div className='mx-auto grid max-w-5xl grid-cols-1 items-center gap-16 px-4 md:grid-cols-2'>
-        {/* LEFT TEXT */}
         <div className='space-y-6 leading-relaxed'>
-          {/* PRIMARY DESCRIPTION */}
           <div onClick={(e) => e.detail === 2 && setEditingPrimary(true)}>
             {editingPrimary ? (
               <textarea
@@ -155,7 +153,6 @@ export function LifeSectionEditor({ initial }: EditorProps) {
             )}
           </div>
 
-          {/* SECONDARY DESCRIPTION */}
           <div onClick={(e) => e.detail === 2 && setEditingSecondary(true)}>
             {editingSecondary ? (
               <textarea
@@ -181,7 +178,6 @@ export function LifeSectionEditor({ initial }: EditorProps) {
           </div>
         </div>
 
-        {/* RIGHT IMAGE (AUTO HEIGHT) */}
         <div className='group relative w-full rounded-2xl overflow-hidden flex items-center justify-center'>
           {data.image_url ? (
             <Image

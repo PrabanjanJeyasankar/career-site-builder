@@ -21,16 +21,16 @@ export function LifeSectionPreview({ data, device }: LifeSectionPreviewProps) {
     },
     tablet: {
       heading: 'text-2xl',
-      primary: 'text-base',
-      secondary: 'text-base',
+      primary: 'text-sm',
+      secondary: 'text-sm',
       image: 'max-h-[200px]',
       section: 'py-6',
       grid: 'flex flex-col gap-8',
     },
     desktop: {
       heading: 'text-4xl',
-      primary: 'text-lg',
-      secondary: 'text-lg',
+      primary: 'text-base',
+      secondary: 'text-base',
       image: 'md:max-h-[400px] sm:max-h-80 max-h-[180px]',
       section: 'py-20',
       grid: 'md:grid md:grid-cols-2 gap-16 flex flex-col',
@@ -51,7 +51,7 @@ export function LifeSectionPreview({ data, device }: LifeSectionPreviewProps) {
         </div>
       </div>
 
-      <div className={`mx-auto max-w-6xl px-4 items-center ${sizes.grid}`}>
+      <div className={`mx-auto max-w-5xl px-4 items-center ${sizes.grid}`}>
         <div className='space-y-6 leading-relaxed'>
           <p className={`${sizes.primary} text-muted-foreground`}>
             {data.description_primary ||

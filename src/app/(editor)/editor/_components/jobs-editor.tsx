@@ -11,7 +11,17 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
+import { ShakeContainer } from '@/components/common/ValidateInput'
+import { Input } from '@/components/ui/input'
 import {
   createJobInline,
   deleteJobInline,
@@ -49,6 +59,26 @@ export function JobsEditor({ initial }: EditorProps) {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [dialogUrl, setDialogUrl] = useState('')
   const [dialogJobId, setDialogJobId] = useState<string | null>(null)
+  const [createDialogOpen, setCreateDialogOpen] = useState(false)
+  const [createSubmitting, setCreateSubmitting] = useState(false)
+  const [createForm, setCreateForm] = useState({
+    title: '',
+    department: '',
+    location: '',
+    workType: '',
+    employmentType: '',
+    description: '',
+    applyUrl: '',
+  })
+  const [createErrors, setCreateErrors] = useState<{
+    title?: string
+    department?: string
+    location?: string
+    workType?: string
+    employmentType?: string
+    description?: string
+    applyUrl?: string
+  }>({})
 
   const [search, setSearch] = useState('')
   const [departmentFilter, setDepartmentFilter] = useState('all')
@@ -88,14 +118,17 @@ export function JobsEditor({ initial }: EditorProps) {
   }
 
   async function addJob() {
-    try {
-      const result = await createJobInline()
-      if (result.success && result.data) {
-        setJobs([...jobs, result.data])
-      }
-    } catch (error) {
-      console.error('Create failed', error)
-    }
+    setCreateForm({
+      title: '',
+      department: '',
+      location: '',
+      workType: '',
+      employmentType: '',
+      description: '',
+      applyUrl: '',
+    })
+    setCreateErrors({})
+    setCreateDialogOpen(true)
   }
 
   async function deleteJob(id: string) {
@@ -112,12 +145,15 @@ export function JobsEditor({ initial }: EditorProps) {
   async function saveApplyUrl() {
     if (!dialogJobId) return
 
+    const trimmedUrl = dialogUrl.trim()
+    if (!trimmedUrl) return
+
     const nextJobs = jobs.map((j) =>
-      j.id === dialogJobId ? { ...j, apply_url: dialogUrl } : j
+      j.id === dialogJobId ? { ...j, apply_url: trimmedUrl } : j
     )
     setJobs(nextJobs)
 
-    await save(dialogJobId, { apply_url: dialogUrl })
+    await save(dialogJobId, { apply_url: trimmedUrl })
     setDialogOpen(false)
   }
 
@@ -524,6 +560,332 @@ export function JobsEditor({ initial }: EditorProps) {
         onValueChange={setDialogUrl}
         onConfirm={saveApplyUrl}
       />
+
+      <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
+        <DialogContent className='max-w-lg'>
+          <DialogHeader>
+            <DialogTitle>Add new role</DialogTitle>
+            <DialogDescription>
+              Fill in all fields to create a new job posting.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className='mt-4 space-y-4'>
+            <div>
+              <label className='text-xs font-medium text-muted-foreground'>
+                Title
+              </label>
+              <ShakeContainer active={!!createErrors.title}>
+                <Input
+                  value={createForm.title}
+                  onChange={(e) => {
+                    setCreateForm((prev) => ({
+                      ...prev,
+                      title: e.target.value,
+                    }))
+                    if (createErrors.title) {
+                      setCreateErrors((prev) => ({ ...prev, title: undefined }))
+                    }
+                  }}
+                  placeholder='Senior Product Designer'
+                  className={
+                    createErrors.title
+                      ? 'border-destructive bg-destructive/10 focus:border-destructive/60 focus:ring-destructive/40'
+                      : undefined
+                  }
+                />
+              </ShakeContainer>
+              {createErrors.title && (
+                <p className='mt-1 text-xs text-destructive'>
+                  {createErrors.title}
+                </p>
+              )}
+            </div>
+
+            <div className='grid gap-4 md:grid-cols-2'>
+              <div>
+                <label className='text-xs font-medium text-muted-foreground'>
+                  Department
+                </label>
+                <ShakeContainer active={!!createErrors.department}>
+                  <Input
+                    value={createForm.department}
+                    onChange={(e) => {
+                      setCreateForm((prev) => ({
+                        ...prev,
+                        department: e.target.value,
+                      }))
+                      if (createErrors.department) {
+                        setCreateErrors((prev) => ({
+                          ...prev,
+                          department: undefined,
+                        }))
+                      }
+                    }}
+                    placeholder='Design'
+                    className={
+                      createErrors.department
+                        ? 'border-destructive bg-destructive/10 focus:border-destructive/60 focus:ring-destructive/40'
+                        : undefined
+                    }
+                  />
+                </ShakeContainer>
+                {createErrors.department && (
+                  <p className='mt-1 text-xs text-destructive'>
+                    {createErrors.department}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className='text-xs font-medium text-muted-foreground'>
+                  Location
+                </label>
+                <ShakeContainer active={!!createErrors.location}>
+                  <Input
+                    value={createForm.location}
+                    onChange={(e) => {
+                      setCreateForm((prev) => ({
+                        ...prev,
+                        location: e.target.value,
+                      }))
+                      if (createErrors.location) {
+                        setCreateErrors((prev) => ({
+                          ...prev,
+                          location: undefined,
+                        }))
+                      }
+                    }}
+                    placeholder='San Francisco, CA'
+                    className={
+                      createErrors.location
+                        ? 'border-destructive bg-destructive/10 focus:border-destructive/60 focus:ring-destructive/40'
+                        : undefined
+                    }
+                  />
+                </ShakeContainer>
+                {createErrors.location && (
+                  <p className='mt-1 text-xs text-destructive'>
+                    {createErrors.location}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className='grid gap-4 md:grid-cols-2'>
+              <div>
+                <label className='text-xs font-medium text-muted-foreground'>
+                  Work type
+                </label>
+                <ShakeContainer active={!!createErrors.workType}>
+                  <select
+                    value={createForm.workType}
+                    onChange={(e) => {
+                      setCreateForm((prev) => ({
+                        ...prev,
+                        workType: e.target.value,
+                      }))
+                      if (createErrors.workType) {
+                        setCreateErrors((prev) => ({
+                          ...prev,
+                          workType: undefined,
+                        }))
+                      }
+                    }}
+                    className={`mt-1 w-full rounded-md border bg-background px-3 py-2 text-xs md:text-sm ${
+                      createErrors.workType
+                        ? 'border-destructive bg-destructive/10 focus:border-destructive/60 focus:ring-destructive/40'
+                        : ''
+                    }`}>
+                    <option value=''>Select work type</option>
+                    <option value='remote'>Remote</option>
+                    <option value='hybrid'>Hybrid</option>
+                    <option value='onsite'>On-site</option>
+                  </select>
+                </ShakeContainer>
+                {createErrors.workType && (
+                  <p className='mt-1 text-xs text-destructive'>
+                    {createErrors.workType}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className='text-xs font-medium text-muted-foreground'>
+                  Employment type
+                </label>
+                <ShakeContainer active={!!createErrors.employmentType}>
+                  <select
+                    value={createForm.employmentType}
+                    onChange={(e) => {
+                      setCreateForm((prev) => ({
+                        ...prev,
+                        employmentType: e.target.value,
+                      }))
+                      if (createErrors.employmentType) {
+                        setCreateErrors((prev) => ({
+                          ...prev,
+                          employmentType: undefined,
+                        }))
+                      }
+                    }}
+                    className={`mt-1 w-full rounded-md border bg-background px-3 py-2 text-xs md:text-sm ${
+                      createErrors.employmentType
+                        ? 'border-destructive bg-destructive/10 focus:border-destructive/60 focus:ring-destructive/40'
+                        : ''
+                    }`}>
+                    <option value=''>Select employment type</option>
+                    <option value='full-time'>Full-time</option>
+                    <option value='part-time'>Part-time</option>
+                    <option value='contract'>Contract</option>
+                    <option value='internship'>Internship</option>
+                  </select>
+                </ShakeContainer>
+                {createErrors.employmentType && (
+                  <p className='mt-1 text-xs text-destructive'>
+                    {createErrors.employmentType}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <label className='text-xs font-medium text-muted-foreground'>
+                Description
+              </label>
+              <ShakeContainer active={!!createErrors.description}>
+                <textarea
+                  rows={4}
+                  value={createForm.description}
+                  onChange={(e) => {
+                    setCreateForm((prev) => ({
+                      ...prev,
+                      description: e.target.value,
+                    }))
+                    if (createErrors.description) {
+                      setCreateErrors((prev) => ({
+                        ...prev,
+                        description: undefined,
+                      }))
+                    }
+                  }}
+                  placeholder='Describe the role, responsibilities, and what success looks like.'
+                  className={`mt-1 w-full rounded-md border bg-transparent px-3 py-2 text-sm shadow-xs ${
+                    createErrors.description
+                      ? 'border-destructive bg-destructive/10 focus:border-destructive/60 focus:ring-destructive/40'
+                      : 'border-input focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]'
+                  }`}
+                />
+              </ShakeContainer>
+              {createErrors.description && (
+                <p className='mt-1 text-xs text-destructive'>
+                  {createErrors.description}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className='text-xs font-medium text-muted-foreground'>
+                Apply URL
+              </label>
+              <ShakeContainer active={!!createErrors.applyUrl}>
+                <Input
+                  value={createForm.applyUrl}
+                  onChange={(e) => {
+                    setCreateForm((prev) => ({
+                      ...prev,
+                      applyUrl: e.target.value,
+                    }))
+                    if (createErrors.applyUrl) {
+                      setCreateErrors((prev) => ({
+                        ...prev,
+                        applyUrl: undefined,
+                      }))
+                    }
+                  }}
+                  placeholder='https://example.com/apply'
+                  className={
+                    createErrors.applyUrl
+                      ? 'border-destructive bg-destructive/10 focus:border-destructive/60 focus:ring-destructive/40'
+                      : undefined
+                  }
+                />
+              </ShakeContainer>
+              {createErrors.applyUrl && (
+                <p className='mt-1 text-xs text-destructive'>
+                  {createErrors.applyUrl}
+                </p>
+              )}
+            </div>
+          </div>
+
+          <DialogFooter className='mt-6'>
+            <Button
+              variant='outline'
+              disabled={createSubmitting}
+              onClick={() => setCreateDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              disabled={createSubmitting}
+              onClick={async () => {
+                const errors: typeof createErrors = {}
+                if (!createForm.title.trim()) {
+                  errors.title = 'Title is required'
+                }
+                if (!createForm.department.trim()) {
+                  errors.department = 'Department is required'
+                }
+                if (!createForm.location.trim()) {
+                  errors.location = 'Location is required'
+                }
+                if (!createForm.workType) {
+                  errors.workType = 'Work type is required'
+                }
+                if (!createForm.employmentType) {
+                  errors.employmentType = 'Employment type is required'
+                }
+                if (!createForm.description.trim()) {
+                  errors.description = 'Description is required'
+                }
+                if (!createForm.applyUrl.trim()) {
+                  errors.applyUrl = 'Apply URL is required'
+                }
+
+                if (Object.keys(errors).length > 0) {
+                  setCreateErrors(errors)
+                  return
+                }
+
+                setCreateSubmitting(true)
+                try {
+                  const result = await createJobInline({
+                    title: createForm.title.trim(),
+                    department: createForm.department.trim(),
+                    location: createForm.location.trim(),
+                    workType: createForm.workType as any,
+                    employmentType: createForm.employmentType as any,
+                    description: createForm.description.trim(),
+                    applyUrl: createForm.applyUrl.trim(),
+                  })
+
+                  if (result.success && result.data) {
+                    setJobs([...jobs, result.data])
+                    setCreateDialogOpen(false)
+                  } else if (!result.success && result.error) {
+                    console.error('Create failed:', result.error)
+                  }
+                } catch (error) {
+                  console.error('Create failed', error)
+                } finally {
+                  setCreateSubmitting(false)
+                }
+              }}>
+              {createSubmitting ? 'Creating...' : 'Create role'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </section>
   )
 }

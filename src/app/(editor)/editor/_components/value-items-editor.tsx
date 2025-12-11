@@ -1,26 +1,31 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
+import { PROFESSIONAL_EMOJIS } from '@/config/emoji-presets'
 import {
   createValueItemInline,
   deleteValueItemInline,
   saveValueItemInline,
 } from '@/lib/actions/valueItemsInline'
 import type { ValueItem } from '@/types/database'
-import { PROFESSIONAL_EMOJIS } from '@/config/emoji-presets'
 import { Plus } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
-import { InlineDeleteButton } from './inline-delete-button'
 import { InlineEmojiPicker } from './inline-emoji-picker'
-import { ValuePerkEditorItem } from './value-perk-editor-item'
 import { SectionHeading } from './section-heading'
 import { ValidatedPromptDialog } from './validated-prompt-dialog'
+import { ValuePerkEditorItem } from './value-perk-editor-item'
 
 type EditorProps = {
   initial: ValueItem[]
+  primaryColor?: string
+  secondaryColor?: string
 }
 
-export function ValueItemsEditor({ initial }: EditorProps) {
+export function ValueItemsEditor({
+  initial,
+  primaryColor,
+  secondaryColor,
+}: EditorProps) {
   const [valueItems, setValueItems] = useState(initial)
 
   const [editingTitle, setEditingTitle] = useState<string | null>(null)
@@ -260,6 +265,10 @@ export function ValueItemsEditor({ initial }: EditorProps) {
                 tileBgClass='bg-chart-1/10'
                 iconBgClass='bg-chart-1/15'
                 iconTextClass='text-chart-1'
+                tileBgColor={secondaryColor || primaryColor}
+                tileBgOpacity={0.1}
+                iconBgColor={primaryColor}
+                iconBgOpacity={0.2}
               />
             )
           })}
@@ -285,8 +294,7 @@ export function ValueItemsEditor({ initial }: EditorProps) {
         placeholder='🚀'
         value={dialogIcon}
         onValueChange={setDialogIcon}
-        onConfirm={saveIcon}
-      >
+        onConfirm={saveIcon}>
         <InlineEmojiPicker onSelect={(emoji) => setDialogIcon(emoji)} />
       </ValidatedPromptDialog>
     </section>

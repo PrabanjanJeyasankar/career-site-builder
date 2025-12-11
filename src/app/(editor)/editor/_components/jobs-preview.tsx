@@ -4,8 +4,8 @@ import type { DeviceType } from '@/components/ui/device-switcher'
 import type { Job } from '@/types/database'
 import { ExternalLink } from 'lucide-react'
 import { useMemo, useState } from 'react'
-import { SectionHeading } from './section-heading'
 import { JobFilters } from './job-filters'
+import { SectionHeading } from './section-heading'
 
 type JobsPreviewProps = {
   data: Job[]
@@ -145,11 +145,9 @@ export function JobsPreview({ data, device }: JobsPreviewProps) {
           className='mb-8'
         />
 
-        <div className='space-y-3'>
+        <div className='divide-y divide-border/60'>
           {filteredJobs.map((job) => (
-            <article
-              key={job.id}
-              className='rounded-xl border border-border/70 bg-card/60 px-4 py-4 md:px-5 md:py-5'>
+            <article key={job.id} className='py-5 md:py-6'>
               <div className='grid grid-cols-[minmax(0,3fr)_minmax(0,2fr)] gap-6 md:grid-cols-[minmax(0,3fr)_minmax(0,1.75fr)]'>
                 <div className='space-y-3'>
                   <h3
@@ -176,26 +174,21 @@ export function JobsPreview({ data, device }: JobsPreviewProps) {
                   </p>
                 </div>
 
-                <div className='flex flex-col justify-between gap-3 text-xs md:text-[0.8rem]'>
+                <div className='flex flex-col justify-center gap-3 text-xs md:text-[0.8rem]'>
                   {job.apply_url ? (
                     <a
                       href={job.apply_url}
                       target='_blank'
                       rel='noopener noreferrer'
-                      className='inline-flex items-center justify-center gap-2 rounded-full bg-foreground px-4 py-2 text-xs font-medium text-background transition-colors hover:bg-foreground/90'>
+                      className='inline-flex items-center justify-center gap-2 self-end rounded-full bg-primary px-4 py-2 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90'>
                       Apply now
                       <ExternalLink className='h-3.5 w-3.5' />
                     </a>
                   ) : (
-                    <div className='rounded-full bg-muted px-4 py-2 text-center text-muted-foreground'>
+                    <div className='inline-flex rounded-full bg-muted px-4 py-2 self-end text-center text-muted-foreground cursor-not-allowed'>
                       Apply link coming soon
                     </div>
                   )}
-
-                  <div className='text-right text-[0.7rem] text-muted-foreground'>
-                    {job.location} ·{' '}
-                    <span className='capitalize'>{job.work_type}</span>
-                  </div>
                 </div>
               </div>
             </article>

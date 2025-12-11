@@ -1,26 +1,31 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
+import { PROFESSIONAL_EMOJIS } from '@/config/emoji-presets'
 import {
   createPerkInline,
   deletePerkInline,
   savePerkInline,
 } from '@/lib/actions/perksInline'
 import type { Perk } from '@/types/database'
-import { PROFESSIONAL_EMOJIS } from '@/config/emoji-presets'
 import { Plus } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
-import { InlineDeleteButton } from './inline-delete-button'
 import { InlineEmojiPicker } from './inline-emoji-picker'
 import { SectionHeading } from './section-heading'
-import { ValuePerkEditorItem } from './value-perk-editor-item'
 import { ValidatedPromptDialog } from './validated-prompt-dialog'
+import { ValuePerkEditorItem } from './value-perk-editor-item'
 
 type EditorProps = {
   initial: Perk[]
+  primaryColor?: string
+  secondaryColor?: string
 }
 
-export function PerksEditor({ initial }: EditorProps) {
+export function PerksEditor({
+  initial,
+  primaryColor,
+  secondaryColor,
+}: EditorProps) {
   const [perks, setPerks] = useState(initial)
 
   const [editingLabel, setEditingLabel] = useState<string | null>(null)
@@ -148,8 +153,7 @@ export function PerksEditor({ initial }: EditorProps) {
         <div className='grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3'>
           {perks.map((perk) => {
             const titleNode = (
-              <div
-                onClick={(e) => e.detail === 2 && setEditingLabel(perk.id)}>
+              <div onClick={(e) => e.detail === 2 && setEditingLabel(perk.id)}>
                 {editingLabel === perk.id ? (
                   <input
                     ref={labelRef}
@@ -157,9 +161,7 @@ export function PerksEditor({ initial }: EditorProps) {
                     onChange={(e) =>
                       setPerks(
                         perks.map((p) =>
-                          p.id === perk.id
-                            ? { ...p, label: e.target.value }
-                            : p
+                          p.id === perk.id ? { ...p, label: e.target.value } : p
                         )
                       )
                     }
@@ -243,6 +245,10 @@ export function PerksEditor({ initial }: EditorProps) {
                 iconBgClass='bg-chart-2/15'
                 iconTextClass='text-chart-2'
                 className='pt-4'
+                tileBgColor={secondaryColor || primaryColor}
+                tileBgOpacity={0.1}
+                iconBgColor={primaryColor || secondaryColor}
+                iconBgOpacity={0.2}
               />
             )
           })}
@@ -270,8 +276,7 @@ export function PerksEditor({ initial }: EditorProps) {
         placeholder='🎉'
         value={dialogIcon}
         onValueChange={setDialogIcon}
-        onConfirm={saveIcon}
-      >
+        onConfirm={saveIcon}>
         <InlineEmojiPicker onSelect={(emoji) => setDialogIcon(emoji)} />
       </ValidatedPromptDialog>
     </section>

@@ -9,7 +9,7 @@ import type {
   Testimonial,
   ValueItem,
 } from '@/types/database'
-import { useState } from 'react'
+import { CSSProperties, useState } from 'react'
 import type { HeroEditorInitialData } from './editor-page-client'
 import { HeroSectionPreview } from './hero-section-preview'
 import { JobsPreview } from './jobs-preview'
@@ -46,21 +46,37 @@ export function PreviewPageClient({
       ? 'w-[768px]'
       : 'w-[390px]'
 
+  const themeStyle: CSSProperties = {
+    ['--primary' as keyof CSSProperties]: heroData.primaryColor,
+    ['--secondary' as keyof CSSProperties]: heroData.secondaryColor,
+  }
+
   return (
-    <div className='relative h-full min-h-screen bg-slate-950 flex flex-col'>
+    <div
+      className='relative h-full min-h-screen flex flex-col rounded-none'
+      style={themeStyle}>
       <div className='absolute right-6 top-6 z-20'>
         <DeviceSwitcher value={device} onChange={setDevice} />
       </div>
 
-      <div className='flex-1 flex items-center justify-center '>
-        <div
-          className={`${frame} rounded-xl overflow-hidden shadow-2xl border border-slate-800 bg-slate-900`}>
+      <div className='flex-1 flex items-center justify-center rounded-none '>
+        <div className={`${frame} overflow-hidden shadow-2xl rounded-none `}>
           <HeroSectionPreview data={heroData} device={device} />
           <LifeSectionPreview data={lifeData} device={device} />
-          <ValueItemsPreview data={valueItemsData} device={device} />
+          <ValueItemsPreview
+            data={valueItemsData}
+            device={device}
+            primaryColor={heroData.primaryColor}
+            secondaryColor={heroData.secondaryColor}
+          />
           <TestimonialsPreview data={testimonialsData} device={device} />
           <LocationsPreview data={locationsData} device={device} />
-          <PerksPreview data={perksData} device={device} />
+          <PerksPreview
+            data={perksData}
+            device={device}
+            primaryColor={heroData.primaryColor}
+            secondaryColor={heroData.secondaryColor}
+          />
           <JobsPreview data={jobsData} device={device} />
         </div>
       </div>

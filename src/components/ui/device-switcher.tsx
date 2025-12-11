@@ -15,12 +15,7 @@ export function DeviceSwitcher({
   onChange,
 }: DeviceSwitcherProps) {
   return (
-    <div
-      className='flex gap-2 rounded-xl p-2 shadow-lg backdrop-blur-md bg-white/20 border border-white/30 dark:bg-slate-800/30 dark:border-slate-300/10'
-      style={{
-        WebkitBackdropFilter: 'blur(12px)',
-        backdropFilter: 'blur(12px)',
-      }}>
+    <div className='flex gap-2 rounded-xl p-2 bg-white shadow-md border border-slate-200 dark:bg-slate-900 dark:border-slate-800'>
       <Button
         variant={value === 'desktop' ? 'default' : 'ghost'}
         size='icon'

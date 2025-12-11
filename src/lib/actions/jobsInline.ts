@@ -45,7 +45,13 @@ export async function saveJobInline(input: {
       payload.employment_type = input.employmentType
     if (input.description !== undefined)
       payload.description = input.description.trim() || 'Add job description...'
-    if (input.applyUrl !== undefined) payload.apply_url = input.applyUrl
+    if (input.applyUrl !== undefined) {
+      const trimmed = input.applyUrl.trim()
+      if (!trimmed) {
+        throw new Error('Apply URL is required')
+      }
+      payload.apply_url = trimmed
+    }
 
     const result = await supabase
       .from('jobs')
@@ -98,7 +104,15 @@ export async function deleteJobInline(id: string) {
   }
 }
 
-export async function createJobInline() {
+export async function createJobInline(input: {
+  title: string
+  department: string
+  location: string
+  workType: 'remote' | 'hybrid' | 'onsite'
+  employmentType: 'full-time' | 'part-time' | 'contract' | 'internship'
+  description: string
+  applyUrl: string
+}) {
   try {
     const supabase = await createSupabaseServerClientForActions()
     const companyId = await getCurrentUserCompanyId()
@@ -107,18 +121,40 @@ export async function createJobInline() {
       throw new Error('Company ID is required but not found')
     }
 
+    const title = input.title.trim()
+    const department = input.department.trim()
+    const location = input.location.trim()
+    const description = input.description.trim()
+    const applyUrl = input.applyUrl.trim()
+
+    if (!title) {
+      throw new Error('Title is required')
+    }
+    if (!department) {
+      throw new Error('Department is required')
+    }
+    if (!location) {
+      throw new Error('Location is required')
+    }
+    if (!description) {
+      throw new Error('Description is required')
+    }
+    if (!applyUrl) {
+      throw new Error('Apply URL is required')
+    }
+
     const result = await supabase
       .from('jobs')
       .insert({
         company_id: companyId,
-        title: 'New Position',
-        department: 'Department',
-        location: 'Location',
-        work_type: 'remote',
-        employment_type: 'full-time',
-        description: 'Add job description...',
+        title,
+        department,
+        location,
+        work_type: input.workType,
+        employment_type: input.employmentType,
+        description,
         posted_at: new Date().toISOString(),
-        apply_url: null,
+        apply_url: applyUrl,
       })
       .select()
       .single()

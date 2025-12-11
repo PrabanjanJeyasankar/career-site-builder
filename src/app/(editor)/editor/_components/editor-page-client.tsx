@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button'
 import { motion } from 'framer-motion'
 import { Eye } from 'lucide-react'
-import { useEffect } from 'react'
+import { useEffect, type CSSProperties } from 'react'
 
 import type {
   Job,
@@ -30,6 +30,7 @@ export type HeroEditorInitialData = {
   heroCtaLabel: string
   heroBackgroundUrl: string
   primaryColor: string
+  secondaryColor: string
 }
 
 type EditorPageClientProps = {
@@ -40,6 +41,7 @@ type EditorPageClientProps = {
   locationsData: Location[]
   perksData: Perk[]
   jobsData: Job[]
+  previewUrl: string
 }
 
 export function EditorPageClient({
@@ -50,6 +52,7 @@ export function EditorPageClient({
   locationsData,
   perksData,
   jobsData,
+  previewUrl,
 }: EditorPageClientProps) {
   useEffect(() => {
     const hash = window.location.hash.replace('#', '')
@@ -59,13 +62,18 @@ export function EditorPageClient({
     window.scrollTo(0, el.offsetTop)
   }, [])
 
+  const themeStyle = {
+    '--primary': heroData.primaryColor,
+    '--secondary': heroData.secondaryColor,
+  } satisfies CSSProperties
+
   return (
-    <div className='relative'>
+    <div className='relative' style={themeStyle}>
       <div className='absolute top-4 right-4 z-30'>
         <Button
           size='sm'
           className='cursor-pointer flex items-center gap-2'
-          onClick={() => window.open('/preview', '_blank')}>
+          onClick={() => window.open(previewUrl, '_blank')}>
           <Eye className='h-4 w-4' />
           Preview
         </Button>
@@ -80,7 +88,11 @@ export function EditorPageClient({
       </motion.div>
 
       <motion.div id='values'>
-        <ValueItemsEditor initial={valueItemsData} />
+        <ValueItemsEditor
+          initial={valueItemsData}
+          primaryColor={heroData.primaryColor}
+          secondaryColor={heroData.secondaryColor}
+        />
       </motion.div>
 
       <motion.div id='testimonials'>
@@ -92,7 +104,11 @@ export function EditorPageClient({
       </motion.div>
 
       <motion.div id='perks'>
-        <PerksEditor initial={perksData} />
+        <PerksEditor
+          initial={perksData}
+          primaryColor={heroData.primaryColor}
+          secondaryColor={heroData.secondaryColor}
+        />
       </motion.div>
 
       <motion.div id='jobs'>

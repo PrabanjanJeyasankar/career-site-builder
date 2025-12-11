@@ -1,21 +1,34 @@
-// preview/page.tsx
-import { PreviewPageClient } from '@/app/(editor)/editor/_components/preview-page-client'
+// preview/[companyId]/page.tsx
 
-import { getCurrentCompanyName } from '@/lib/db/company'
+import { PreviewPageClient } from '@/app/(editor)/editor/_components/preview-page-client'
+import { getCompanyNameById } from '@/lib/db/company'
 import {
-  getCompanyProfileForCurrentCompany,
-  getJobsForCurrentCompany,
-  getLifeSectionForCurrentCompany,
-  getLocationsForCurrentCompany,
-  getPerksForCurrentCompany,
-  getTestimonialsForCurrentCompany,
-  getValueItemsForCurrentCompany,
+  getCompanyProfileByCompanyId,
+  getJobsByCompanyId,
+  getLifeSectionByCompanyId,
+  getLocationsByCompanyId,
+  getPerksByCompanyId,
+  getTestimonialsByCompanyId,
+  getValueItemsByCompanyId,
 } from '@/lib/db/fetchSectionData'
 import type { LifeSection } from '@/types/database'
+import { notFound } from 'next/navigation'
 
-export default async function PreviewPage() {
+type PreviewPageProps = {
+  params: Promise<{
+    companyId: string
+  }>
+}
+
+export default async function PreviewPage({ params }: PreviewPageProps) {
+  const { companyId } = await params
+
+  if (!companyId) {
+    notFound()
+  }
+
   const [
-    companyResult,
+    companyNameResult,
     profileResult,
     lifeResult,
     testimonialsResult,
@@ -24,18 +37,26 @@ export default async function PreviewPage() {
     perksResult,
     jobsResult,
   ] = await Promise.allSettled([
-    getCurrentCompanyName(),
-    getCompanyProfileForCurrentCompany(),
-    getLifeSectionForCurrentCompany(),
-    getTestimonialsForCurrentCompany(),
-    getValueItemsForCurrentCompany(),
-    getLocationsForCurrentCompany(),
-    getPerksForCurrentCompany(),
-    getJobsForCurrentCompany(),
+    getCompanyNameById(companyId),
+    getCompanyProfileByCompanyId(companyId),
+    getLifeSectionByCompanyId(companyId),
+    getTestimonialsByCompanyId(companyId),
+    getValueItemsByCompanyId(companyId),
+    getLocationsByCompanyId(companyId),
+    getPerksByCompanyId(companyId),
+    getJobsByCompanyId(companyId),
   ])
 
   const companyName =
-    companyResult.status === 'fulfilled' ? companyResult.value : 'Your company'
+    companyNameResult.status === 'fulfilled' && companyNameResult.value
+      ? companyNameResult.value
+      : null
+
+  if (!companyName) {
+    // If the company itself is missing, avoid leaking information and 404.
+    notFound()
+  }
+
   const profile =
     profileResult.status === 'fulfilled' ? profileResult.value : null
 
@@ -43,7 +64,7 @@ export default async function PreviewPage() {
     lifeResult.status === 'fulfilled' && lifeResult.value
       ? lifeResult.value
       : {
-          company_id: '',
+          company_id: companyId,
           heading: '',
           description_primary: '',
           description_secondary: '',
@@ -75,6 +96,7 @@ export default async function PreviewPage() {
     heroCtaLabel: profile?.hero_cta_label ?? 'View jobs',
     heroBackgroundUrl: profile?.hero_background_url ?? '',
     primaryColor: profile?.primary_color ?? '#059669',
+    secondaryColor: profile?.secondary_color ?? '#f5f5f5',
   }
 
   return (
