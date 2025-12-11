@@ -1,15 +1,6 @@
 'use client'
 
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
+import { ImageUploadDialog } from '@/components/common/ImageUploadDialog'
 import { Button } from '@/components/ui/button'
 import { saveLifeSectionInline } from '@/lib/actions/lifeSectionInline'
 import type { LifeSection } from '@/types/database'
@@ -32,8 +23,13 @@ export function LifeSectionEditor({ initial }: EditorProps) {
   const primaryRef = useRef<HTMLTextAreaElement | null>(null)
   const secondaryRef = useRef<HTMLTextAreaElement | null>(null)
 
-  const [open, setOpen] = useState(false)
-  const [url, setUrl] = useState('')
+  const [imageDialogOpen, setImageDialogOpen] = useState(false)
+
+  async function handleImageUpload(url: string) {
+    const next = { ...data, image_url: url }
+    setData(next)
+    await save({ image_url: url })
+  }
 
   async function save(patch: Partial<LifeSection>) {
     const payload = {
@@ -58,13 +54,6 @@ export function LifeSectionEditor({ initial }: EditorProps) {
     } catch (error) {
       console.error('[LifeSectionEditor] Save failed', error)
     }
-  }
-
-  async function saveImage() {
-    const next = { ...data, image_url: url }
-    setData(next)
-    await save({ image_url: url })
-    setOpen(false)
   }
 
   useEffect(() => {
@@ -195,11 +184,8 @@ export function LifeSectionEditor({ initial }: EditorProps) {
             <Button
               size='sm'
               variant='secondary'
-              className='cursor-pointer flex items-center gap-2'
-              onClick={() => {
-                setUrl(data.image_url ?? '')
-                setOpen(true)
-              }}>
+              className='cursor-pointer flex items-center gap-2 text-white'
+              onClick={() => setImageDialogOpen(true)}>
               <Replace className='h-4 w-4' />
               Replace
             </Button>
@@ -207,28 +193,15 @@ export function LifeSectionEditor({ initial }: EditorProps) {
         </div>
       </div>
 
-      <AlertDialog open={open} onOpenChange={setOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Replace Image</AlertDialogTitle>
-            <AlertDialogDescription>
-              Paste a public image URL.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-
-          <input
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            className='mt-4 w-full rounded border p-2 outline-none'
-            placeholder='https://example.com/image.jpg'
-          />
-
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={saveImage}>Save</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ImageUploadDialog
+        open={imageDialogOpen}
+        onOpenChange={setImageDialogOpen}
+        onUpload={handleImageUpload}
+        existingUrl={data.image_url ?? undefined}
+        title='Upload life section image'
+        description='Select an image that represents your company culture'
+        allowedFormats={['image/jpeg', 'image/png', 'image/webp']}
+      />
     </section>
   )
 }

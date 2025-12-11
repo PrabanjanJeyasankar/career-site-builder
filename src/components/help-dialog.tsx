@@ -1,6 +1,16 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
+import { useMemo, useState } from 'react'
+import {
+  LifeBuoy,
+  Link2,
+  MonitorSmartphone,
+  MousePointerClick,
+  MoveVertical,
+  Palette,
+  UploadCloud,
+} from 'lucide-react'
+
 import {
   Dialog,
   DialogContent,
@@ -11,14 +21,10 @@ import {
 } from '@/components/ui/dialog'
 import { Separator } from '@/components/ui/separator'
 import {
-  LifeBuoy,
-  Link2,
-  MonitorSmartphone,
-  MousePointerClick,
-  MoveVertical,
-  Palette,
-} from 'lucide-react'
-import { useMemo, useState } from 'react'
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from '@/components/ui/sidebar'
 
 export function HelpDialog() {
   const [open, setOpen] = useState(false)
@@ -40,6 +46,11 @@ export function HelpDialog() {
         body: 'Use Brand Assets for logo, favicon, and primary/secondary colors.',
       },
       {
+        icon: UploadCloud,
+        title: 'Add your own images',
+        body: 'Use the image upload buttons or dialogs to pick files from your computer or paste a URL—previews appear instantly.',
+      },
+      {
         icon: MonitorSmartphone,
         title: 'Preview devices',
         body: 'Use the Preview button to switch desktop, tablet, mobile views.',
@@ -55,15 +66,19 @@ export function HelpDialog() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button
-          variant='ghost'
-          size='sm'
-          className='w-full justify-start gap-2 px-2 text-left text-sm'>
-          <LifeBuoy className='h-4 w-4 text-primary' />
-          Help & tips
-        </Button>
-      </DialogTrigger>
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <DialogTrigger asChild>
+            <SidebarMenuButton
+              size='sm'
+              tooltip='Help & tips'
+              className='justify-start text-left text-sm'>
+              <LifeBuoy className='h-4 w-4 text-primary' />
+              <span className='truncate'>Help & tips</span>
+            </SidebarMenuButton>
+          </DialogTrigger>
+        </SidebarMenuItem>
+      </SidebarMenu>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>How to use the editor</DialogTitle>

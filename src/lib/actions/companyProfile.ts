@@ -17,25 +17,30 @@ export async function saveCompanyProfile(
   const supabase = await createSupabaseServerClientForActions()
   const companyId = await getCurrentUserCompanyId()
 
-   if (!companyId) {
+  if (!companyId) {
     return { error: 'User is not associated with any company' }
   }
 
   const parsed = companyProfileFormSchema.parse(values)
   const payload = normalizeCompanyProfilePayload(parsed)
 
-  const { error } = await supabase
-    .from('company_profile')
-    .upsert(
-      {
-        company_id: companyId,
-        ...payload,
-        updated_at: new Date().toISOString(),
-      },
-      {
-        onConflict: 'company_id',
-      }
-    )
+  console.log('Saving company profile:', {
+    companyId,
+    favicon_url: payload.favicon_url,
+    logo_url: payload.logo_url,
+    fullPayload: payload,
+  })
+
+  const { error } = await supabase.from('company_profile').upsert(
+    {
+      company_id: companyId,
+      ...payload,
+      updated_at: new Date().toISOString(),
+    },
+    {
+      onConflict: 'company_id',
+    }
+  )
 
   if (error) {
     console.error('Failed to save company profile', error)
@@ -43,6 +48,7 @@ export async function saveCompanyProfile(
   }
 
   revalidatePath('/brand-assets')
+  revalidatePath('/', 'layout')
   return { success: true }
 }
 
@@ -67,14 +73,8 @@ const heroInlineUpdateSchema = z.object({
     .trim()
     .max(40, 'CTA label must be under 40 characters')
     .optional(),
-  heroBackgroundUrl: z
-    .string()
-    .trim()
-    .optional(),
-  logoUrl: z
-    .string()
-    .trim()
-    .optional(),
+  heroBackgroundUrl: z.string().trim().optional(),
+  logoUrl: z.string().trim().optional(),
 })
 
 export type HeroInlineUpdateInput = z.infer<typeof heroInlineUpdateSchema>
@@ -103,8 +103,7 @@ export async function saveHeroSectionInline(
   const update: HeroInlineUpdatePayload = {}
 
   if (payload.heroTitle !== undefined) {
-    update.hero_title =
-      payload.heroTitle.length > 0 ? payload.heroTitle : null
+    update.hero_title = payload.heroTitle.length > 0 ? payload.heroTitle : null
   }
 
   if (payload.heroSubtitle !== undefined) {
@@ -131,18 +130,16 @@ export async function saveHeroSectionInline(
     update.logo_url = payload.logoUrl.length > 0 ? payload.logoUrl : null
   }
 
-  const { error } = await supabase
-    .from('company_profile')
-    .upsert(
-      {
-        company_id: companyId,
-        ...update,
-        updated_at: new Date().toISOString(),
-      },
-      {
-        onConflict: 'company_id',
-      }
-    )
+  const { error } = await supabase.from('company_profile').upsert(
+    {
+      company_id: companyId,
+      ...update,
+      updated_at: new Date().toISOString(),
+    },
+    {
+      onConflict: 'company_id',
+    }
+  )
 
   if (error) {
     console.error('Failed to save hero section inline', error)

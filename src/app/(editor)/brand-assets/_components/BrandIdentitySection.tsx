@@ -1,8 +1,13 @@
 // BrandIdentitySection.tsx
 
-import { Brush, Info } from 'lucide-react'
-import type { FieldErrors, UseFormRegister } from 'react-hook-form'
+import { Brush, Image as ImageIcon, Info, X } from 'lucide-react'
+import Image from 'next/image'
+import { useState } from 'react'
+import type { Control, FieldErrors, UseFormRegister } from 'react-hook-form'
+import { Controller } from 'react-hook-form'
 
+import { ImageUploadDialog } from '@/components/common/ImageUploadDialog'
+import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
@@ -24,15 +29,20 @@ const TEXTAREA_CLASSNAME =
 
 type BrandIdentitySectionProps = {
   register: UseFormRegister<CompanyProfileFormValues>
+  control: Control<CompanyProfileFormValues>
   errors: FieldErrors<CompanyProfileFormValues>
   children?: React.ReactNode
 }
 
 export function BrandIdentitySection({
   register,
+  control,
   errors,
   children,
 }: BrandIdentitySectionProps) {
+  const [logoDialogOpen, setLogoDialogOpen] = useState(false)
+  const [faviconDialogOpen, setFaviconDialogOpen] = useState(false)
+
   return (
     <Card>
       <CardHeader>
@@ -93,33 +103,127 @@ export function BrandIdentitySection({
         </Field>
 
         <div className='grid gap-6 md:grid-cols-2'>
-          <Field>
-            <div className='flex items-center gap-2'>
-              <FieldLabel htmlFor='logo_url'>Logo URL</FieldLabel>
-              <InfoTooltip content='Prefer a transparent PNG or SVG stored in your CDN.' />
-            </div>
-            <Input
-              id='logo_url'
-              type='url'
-              placeholder='https://cdn.example.com/logo.svg'
-              {...register('logo_url')}
-            />
-            <FieldError errors={[errors.logo_url]} />
-          </Field>
+          <Controller
+            name='logo_url'
+            control={control}
+            render={({ field }) => (
+              <Field>
+                <div className='flex items-center gap-2'>
+                  <FieldLabel htmlFor='logo_url'>Logo</FieldLabel>
+                  <InfoTooltip content='Prefer a transparent PNG or SVG for best results.' />
+                </div>
+                {field.value ? (
+                  <div className='group relative flex items-center gap-3 rounded-md border bg-card p-3'>
+                    <div className='relative h-12 w-12 overflow-hidden rounded bg-muted'>
+                      <Image
+                        src={field.value}
+                        alt='Logo'
+                        fill
+                        className='object-contain'
+                        unoptimized
+                      />
+                    </div>
+                    <div className='flex-1 min-w-0'>
+                      <p className='text-sm font-medium truncate'>
+                        Logo uploaded
+                      </p>
+                      <p className='text-xs text-muted-foreground truncate'>
+                        {field.value}
+                      </p>
+                    </div>
+                    <Button
+                      type='button'
+                      variant='ghost'
+                      size='icon'
+                      className='h-8 w-8 shrink-0'
+                      onClick={() => field.onChange('')}>
+                      <X className='h-4 w-4' />
+                    </Button>
+                  </div>
+                ) : (
+                  <Button
+                    type='button'
+                    variant='outline'
+                    className='w-full justify-start'
+                    onClick={() => setLogoDialogOpen(true)}>
+                    <ImageIcon className='mr-2 h-4 w-4' />
+                    Upload logo
+                  </Button>
+                )}
+                <FieldError errors={[errors.logo_url]} />
+                <ImageUploadDialog
+                  open={logoDialogOpen}
+                  onOpenChange={setLogoDialogOpen}
+                  onUpload={field.onChange}
+                  existingUrl={field.value}
+                  title='Upload company logo'
+                  description='Select a logo file from your computer'
+                  allowedFormats={['image/png', 'image/svg+xml', 'image/webp']}
+                />
+              </Field>
+            )}
+          />
 
-          <Field>
-            <div className='flex items-center gap-2'>
-              <FieldLabel htmlFor='favicon_url'>Favicon URL</FieldLabel>
-              <InfoTooltip content='Used for the browser tab icon and social previews.' />
-            </div>
-            <Input
-              id='favicon_url'
-              type='url'
-              placeholder='https://cdn.example.com/favicon.png'
-              {...register('favicon_url')}
-            />
-            <FieldError errors={[errors.favicon_url]} />
-          </Field>
+          <Controller
+            name='favicon_url'
+            control={control}
+            render={({ field }) => (
+              <Field>
+                <div className='flex items-center gap-2'>
+                  <FieldLabel htmlFor='favicon_url'>Favicon</FieldLabel>
+                  <InfoTooltip content='Used for the browser tab icon and social previews.' />
+                </div>
+                {field.value ? (
+                  <div className='group relative flex items-center gap-3 rounded-md border bg-card p-3'>
+                    <div className='relative h-12 w-12 overflow-hidden rounded bg-muted'>
+                      <Image
+                        src={field.value}
+                        alt='Favicon'
+                        fill
+                        className='object-contain'
+                        unoptimized
+                      />
+                    </div>
+                    <div className='flex-1 min-w-0'>
+                      <p className='text-sm font-medium truncate'>
+                        Favicon uploaded
+                      </p>
+                      <p className='text-xs text-muted-foreground truncate'>
+                        {field.value}
+                      </p>
+                    </div>
+                    <Button
+                      type='button'
+                      variant='ghost'
+                      size='icon'
+                      className='h-8 w-8 shrink-0'
+                      onClick={() => field.onChange('')}>
+                      <X className='h-4 w-4' />
+                    </Button>
+                  </div>
+                ) : (
+                  <Button
+                    type='button'
+                    variant='outline'
+                    className='w-full justify-start'
+                    onClick={() => setFaviconDialogOpen(true)}>
+                    <ImageIcon className='mr-2 h-4 w-4' />
+                    Upload favicon
+                  </Button>
+                )}
+                <FieldError errors={[errors.favicon_url]} />
+                <ImageUploadDialog
+                  open={faviconDialogOpen}
+                  onOpenChange={setFaviconDialogOpen}
+                  onUpload={field.onChange}
+                  existingUrl={field.value}
+                  title='Upload favicon'
+                  description='Select a favicon file from your computer'
+                  allowedFormats={['image/png', 'image/x-icon']}
+                />
+              </Field>
+            )}
+          />
         </div>
       </CardContent>
     </Card>

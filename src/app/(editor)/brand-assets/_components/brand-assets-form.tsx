@@ -1,8 +1,10 @@
-// BrandAssetsForm.tsx
+// brand-assets-form.tsx
 'use client'
 
+import { useCallback } from 'react'
 import { useWatch } from 'react-hook-form'
 
+import { saveCompanyProfile } from '@/lib/actions/companyProfile'
 import type { CompanyProfileFormValues } from '@/lib/validation/companyProfileSchema'
 
 import { Button } from '@/components/ui/button'
@@ -10,8 +12,7 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 
 import { useAIBrandGenerator } from '@/hooks/use-ai-brand-generator'
 import { useBrandAssetsForm } from '@/hooks/use-brand-assets-form'
-import { useColorFieldsCoordinator } from '@/hooks/use-color-fields-coordinator'
-import { useFormSubmission } from '@/hooks/use-form-submission'
+import { useColorPicker } from '@/hooks/use-color-picker'
 import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
 
 import { AIBrandGenerator } from './AIBrandGenerator'
@@ -37,9 +38,9 @@ export function BrandAssetsForm({
       onSuccess: () => {
         unsavedChanges.allowNavigation()
         if (unsavedChanges.pendingNavigation.current) {
-          const navigate = unsavedChanges.pendingNavigation.current
+          const nav = unsavedChanges.pendingNavigation.current
           unsavedChanges.pendingNavigation.current = undefined
-          navigate()
+          nav()
         }
       },
     })
@@ -56,12 +57,21 @@ export function BrandAssetsForm({
   const secondaryColor =
     useWatch({ control, name: 'secondary_color' }) || '#f5f5f5'
 
-  const colorFields = useColorFieldsCoordinator({ setValue })
+  const primaryColorPicker = useColorPicker({
+    onChange: (color) => {
+      setValue('primary_color', color, { shouldDirty: true, shouldTouch: true })
+      secondaryColorPicker.close()
+    },
+  })
 
-  const { submitForm } = useFormSubmission({
-    onSuccess: handleSuccess,
-    onError: handleError,
-    resetStatus,
+  const secondaryColorPicker = useColorPicker({
+    onChange: (color) => {
+      setValue('secondary_color', color, {
+        shouldDirty: true,
+        shouldTouch: true,
+      })
+      primaryColorPicker.close()
+    },
   })
 
   const aiBrandGenerator = useAIBrandGenerator({
@@ -85,6 +95,21 @@ export function BrandAssetsForm({
 
   const unsavedChanges = useUnsavedChangesGuard({ isDirty })
 
+  const onSubmit = useCallback(
+    async (values: CompanyProfileFormValues) => {
+      resetStatus()
+
+      const result = await saveCompanyProfile(values)
+      if (result?.error) {
+        handleError(result.error)
+        return
+      }
+
+      handleSuccess(values)
+    },
+    [resetStatus, handleSuccess, handleError]
+  )
+
   const {
     ref: primaryColorRef,
     onChange: primaryColorOnChange,
@@ -102,7 +127,7 @@ export function BrandAssetsForm({
       <form
         onSubmit={(event) => {
           event.preventDefault()
-          handleSubmit(submitForm)(event)
+          handleSubmit(onSubmit)(event)
         }}
         className='space-y-8'>
         <FormStatusBanner status={status} message={message} />
@@ -125,14 +150,17 @@ export function BrandAssetsForm({
               label='Primary color'
               tooltipContent='Buttons and key accents use this color.'
               color={primaryColor}
-              isPickerOpen={colorFields.primary.isOpen}
-              pickerRef={colorFields.primary.pickerRef}
+              isPickerOpen={primaryColorPicker.isOpen}
+              pickerRef={primaryColorPicker.pickerRef}
               error={errors.primary_color}
-              onTogglePicker={colorFields.primary.toggle}
-              onColorChange={colorFields.primary.handleColorChange}
+              onTogglePicker={() => {
+                primaryColorPicker.toggle()
+                secondaryColorPicker.close()
+              }}
+              onColorChange={primaryColorPicker.handleColorChange}
               onInputChange={(e) => {
                 primaryColorOnChange(e)
-                colorFields.primary.close()
+                primaryColorPicker.close()
               }}
               inputProps={{ ...primaryColorField, ref: primaryColorRef }}
             />
@@ -142,14 +170,17 @@ export function BrandAssetsForm({
               label='Secondary color'
               tooltipContent='Backgrounds for cards and subtle UI.'
               color={secondaryColor}
-              isPickerOpen={colorFields.secondary.isOpen}
-              pickerRef={colorFields.secondary.pickerRef}
+              isPickerOpen={secondaryColorPicker.isOpen}
+              pickerRef={secondaryColorPicker.pickerRef}
               error={errors.secondary_color}
-              onTogglePicker={colorFields.secondary.toggle}
-              onColorChange={colorFields.secondary.handleColorChange}
+              onTogglePicker={() => {
+                secondaryColorPicker.toggle()
+                primaryColorPicker.close()
+              }}
+              onColorChange={secondaryColorPicker.handleColorChange}
               onInputChange={(e) => {
                 secondaryColorOnChange(e)
-                colorFields.secondary.close()
+                secondaryColorPicker.close()
               }}
               inputProps={{ ...secondaryColorField, ref: secondaryColorRef }}
             />
@@ -182,7 +213,7 @@ export function BrandAssetsForm({
         open={unsavedChanges.showPrompt}
         onOpenChange={unsavedChanges.setShowPrompt}
         onDiscard={unsavedChanges.confirmNavigation}
-        onSave={() => handleSubmit(submitForm)()}
+        onSave={() => handleSubmit(onSubmit)()}
         onCancel={unsavedChanges.cancelNavigation}
       />
     </TooltipProvider>

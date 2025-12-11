@@ -221,7 +221,7 @@ export function LocationsEditor({ initial }: EditorProps) {
                       )
                     }
                     className='h-8 px-2 text-xs flex items-center gap-1'>
-                    <Replace className='h-3 w-3' />
+                    <Replace className='h-3 w-3 text' />
                     Image
                   </Button>
                 </div>

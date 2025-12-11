@@ -1,8 +1,13 @@
 // HeroContentSection.tsx
 
-import { Info, Megaphone } from 'lucide-react'
-import type { FieldErrors, UseFormRegister } from 'react-hook-form'
+import { Image as ImageIcon, Info, Megaphone, X } from 'lucide-react'
+import Image from 'next/image'
+import { useState } from 'react'
+import type { Control, FieldErrors, UseFormRegister } from 'react-hook-form'
+import { Controller } from 'react-hook-form'
 
+import { ImageUploadDialog } from '@/components/common/ImageUploadDialog'
+import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
@@ -24,13 +29,17 @@ const TEXTAREA_CLASSNAME =
 
 type HeroContentSectionProps = {
   register: UseFormRegister<CompanyProfileFormValues>
+  control: Control<CompanyProfileFormValues>
   errors: FieldErrors<CompanyProfileFormValues>
 }
 
 export function HeroContentSection({
   register,
+  control,
   errors,
 }: HeroContentSectionProps) {
+  const [heroImageDialogOpen, setHeroImageDialogOpen] = useState(false)
+
   return (
     <Card>
       <CardHeader>
@@ -101,21 +110,68 @@ export function HeroContentSection({
             <FieldError errors={[errors.hero_cta_label]} />
           </Field>
 
-          <Field>
-            <div className='flex items-center gap-2'>
-              <FieldLabel htmlFor='hero_background_url'>
-                Hero background image
-              </FieldLabel>
-              <InfoTooltip content='Optional high-resolution visual that sits behind the hero.' />
-            </div>
-            <Input
-              id='hero_background_url'
-              type='url'
-              placeholder='https://cdn.example.com/hero.jpg'
-              {...register('hero_background_url')}
-            />
-            <FieldError errors={[errors.hero_background_url]} />
-          </Field>
+          <Controller
+            name='hero_background_url'
+            control={control}
+            render={({ field }) => (
+              <Field>
+                <div className='flex items-center gap-2'>
+                  <FieldLabel htmlFor='hero_background_url'>
+                    Hero background image
+                  </FieldLabel>
+                  <InfoTooltip content='Optional high-resolution visual that sits behind the hero.' />
+                </div>
+                {field.value ? (
+                  <div className='group relative flex items-center gap-3 rounded-md border bg-card p-3'>
+                    <div className='relative h-12 w-20 overflow-hidden rounded bg-muted'>
+                      <Image
+                        src={field.value}
+                        alt='Hero background'
+                        fill
+                        className='object-cover'
+                        unoptimized
+                      />
+                    </div>
+                    <div className='flex-1 min-w-0'>
+                      <p className='text-sm font-medium truncate'>
+                        Hero image uploaded
+                      </p>
+                      <p className='text-xs text-muted-foreground truncate'>
+                        {field.value}
+                      </p>
+                    </div>
+                    <Button
+                      type='button'
+                      variant='ghost'
+                      size='icon'
+                      className='h-8 w-8 shrink-0'
+                      onClick={() => field.onChange('')}>
+                      <X className='h-4 w-4' />
+                    </Button>
+                  </div>
+                ) : (
+                  <Button
+                    type='button'
+                    variant='outline'
+                    className='w-full justify-start'
+                    onClick={() => setHeroImageDialogOpen(true)}>
+                    <ImageIcon className='mr-2 h-4 w-4' />
+                    Upload hero image
+                  </Button>
+                )}
+                <FieldError errors={[errors.hero_background_url]} />
+                <ImageUploadDialog
+                  open={heroImageDialogOpen}
+                  onOpenChange={setHeroImageDialogOpen}
+                  onUpload={field.onChange}
+                  existingUrl={field.value}
+                  title='Upload hero background image'
+                  description='Select a high-resolution image for your hero section'
+                  allowedFormats={['image/jpeg', 'image/png', 'image/webp']}
+                />
+              </Field>
+            )}
+          />
         </div>
       </CardContent>
     </Card>

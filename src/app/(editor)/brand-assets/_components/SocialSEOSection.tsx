@@ -1,8 +1,13 @@
 // SocialSEOSection.tsx
 
-import { Info, Share2 } from 'lucide-react'
-import type { FieldErrors, UseFormRegister } from 'react-hook-form'
+import { Image as ImageIcon, Info, Share2, X } from 'lucide-react'
+import Image from 'next/image'
+import { useState } from 'react'
+import type { Control, FieldErrors } from 'react-hook-form'
+import { Controller } from 'react-hook-form'
 
+import { ImageUploadDialog } from '@/components/common/ImageUploadDialog'
+import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
@@ -11,7 +16,6 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
 import {
   Tooltip,
   TooltipContent,
@@ -20,11 +24,13 @@ import {
 import type { CompanyProfileFormValues } from '@/lib/validation/companyProfileSchema'
 
 type SocialSEOSectionProps = {
-  register: UseFormRegister<CompanyProfileFormValues>
+  control: Control<CompanyProfileFormValues>
   errors: FieldErrors<CompanyProfileFormValues>
 }
 
-export function SocialSEOSection({ register, errors }: SocialSEOSectionProps) {
+export function SocialSEOSection({ control, errors }: SocialSEOSectionProps) {
+  const [socialImageDialogOpen, setSocialImageDialogOpen] = useState(false)
+
   return (
     <Card>
       <CardHeader>
@@ -38,21 +44,68 @@ export function SocialSEOSection({ register, errors }: SocialSEOSectionProps) {
       </CardHeader>
 
       <CardContent className='space-y-6'>
-        <Field>
-          <div className='flex items-center gap-2'>
-            <FieldLabel htmlFor='social_preview_url'>
-              Social preview image
-            </FieldLabel>
-            <InfoTooltip content='Recommended 1200 x 630 px JPG/PNG used for Open Graph tags.' />
-          </div>
-          <Input
-            id='social_preview_url'
-            type='url'
-            placeholder='https://cdn.example.com/social-preview.png'
-            {...register('social_preview_url')}
-          />
-          <FieldError errors={[errors.social_preview_url]} />
-        </Field>
+        <Controller
+          name='social_preview_url'
+          control={control}
+          render={({ field }) => (
+            <Field>
+              <div className='flex items-center gap-2'>
+                <FieldLabel htmlFor='social_preview_url'>
+                  Social preview image
+                </FieldLabel>
+                <InfoTooltip content='Recommended 1200 x 630 px JPG/PNG used for Open Graph tags.' />
+              </div>
+              {field.value ? (
+                <div className='group relative flex items-center gap-3 rounded-md border bg-card p-3'>
+                  <div className='relative h-12 w-20 overflow-hidden rounded bg-muted'>
+                    <Image
+                      src={field.value}
+                      alt='Social preview'
+                      fill
+                      className='object-cover'
+                      unoptimized
+                    />
+                  </div>
+                  <div className='flex-1 min-w-0'>
+                    <p className='text-sm font-medium truncate'>
+                      Social preview uploaded
+                    </p>
+                    <p className='text-xs text-muted-foreground truncate'>
+                      {field.value}
+                    </p>
+                  </div>
+                  <Button
+                    type='button'
+                    variant='ghost'
+                    size='icon'
+                    className='h-8 w-8 shrink-0'
+                    onClick={() => field.onChange('')}>
+                    <X className='h-4 w-4' />
+                  </Button>
+                </div>
+              ) : (
+                <Button
+                  type='button'
+                  variant='outline'
+                  className='w-full justify-start'
+                  onClick={() => setSocialImageDialogOpen(true)}>
+                  <ImageIcon className='mr-2 h-4 w-4' />
+                  Upload social preview
+                </Button>
+              )}
+              <FieldError errors={[errors.social_preview_url]} />
+              <ImageUploadDialog
+                open={socialImageDialogOpen}
+                onOpenChange={setSocialImageDialogOpen}
+                onUpload={field.onChange}
+                existingUrl={field.value}
+                title='Upload social preview image'
+                description='Select an image for social media and messaging previews'
+                allowedFormats={['image/jpeg', 'image/png', 'image/webp']}
+              />
+            </Field>
+          )}
+        />
       </CardContent>
     </Card>
   )

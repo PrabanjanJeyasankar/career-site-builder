@@ -6,17 +6,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { saveHeroSectionInline } from '@/lib/actions/companyProfile'
 
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
-
+import { ImageUploadDialog } from '@/components/common/ImageUploadDialog'
 import { ImageIcon, Replace } from 'lucide-react'
 import type { HeroEditorInitialData } from '../editor-page-client'
 
@@ -52,32 +42,20 @@ export function HeroSectionEditor({ initialData }: HeroSectionEditorProps) {
   const [error, setError] = useState<string | null>(null)
 
   // dialog state
-  const [dialogOpen, setDialogOpen] = useState(false)
-  const [dialogType, setDialogType] = useState<'logo' | 'background' | null>(
-    null
-  )
-  const [dialogUrl, setDialogUrl] = useState('')
+  const [logoDialogOpen, setLogoDialogOpen] = useState(false)
+  const [backgroundDialogOpen, setBackgroundDialogOpen] = useState(false)
 
   const titleRef = useRef<HTMLInputElement | null>(null)
   const subtitleRef = useRef<HTMLInputElement | null>(null)
   const descriptionRef = useRef<HTMLTextAreaElement | null>(null)
   const ctaRef = useRef<HTMLInputElement | null>(null)
 
-  function openDialog(type: 'logo' | 'background', existing: string) {
-    setDialogType(type)
-    setDialogUrl(existing)
-    setDialogOpen(true)
+  async function handleLogoUpload(url: string) {
+    await saveAll({ logoUrl: url })
   }
 
-  async function submitDialog() {
-    if (!dialogUrl.trim()) return
-    if (dialogType === 'logo') {
-      await saveAll({ logoUrl: dialogUrl.trim() })
-    }
-    if (dialogType === 'background') {
-      await saveAll({ heroBackgroundUrl: dialogUrl.trim() })
-    }
-    setDialogOpen(false)
+  async function handleBackgroundUpload(url: string) {
+    await saveAll({ heroBackgroundUrl: url })
   }
 
   useEffect(() => {
@@ -154,7 +132,7 @@ export function HeroSectionEditor({ initialData }: HeroSectionEditorProps) {
             <Button
               variant='outline'
               size='sm'
-              onClick={() => openDialog('background', state.heroBackgroundUrl)}
+              onClick={() => setBackgroundDialogOpen(true)}
               className='cursor-pointer flex items-center gap-2 border-white/20 bg-black/20 text-xs text-white hover:bg-white/10 hover:text-white'>
               <ImageIcon className='h-4 w-4' />
               Change background
@@ -172,7 +150,7 @@ export function HeroSectionEditor({ initialData }: HeroSectionEditorProps) {
                   alt={`${initialData.companyName} logo`}
                   width={140}
                   height={140}
-                  className='h-28 w-28 rounded-full object-contain'
+                  className='h-28 w-28 rounded-none object-contain'
                 />
               ) : (
                 <div className='flex h-20 w-20 items-center justify-center rounded-full border border-white/30 bg-white/10 text-xs font-medium text-white/80'>
@@ -186,7 +164,7 @@ export function HeroSectionEditor({ initialData }: HeroSectionEditorProps) {
                     size='sm'
                     variant='secondary'
                     className='cursor-pointer h-7 px-3 text-xs flex items-center gap-2'
-                    onClick={() => openDialog('logo', state.logoUrl)}>
+                    onClick={() => setLogoDialogOpen(true)}>
                     <Replace className='h-3 w-3' />
                     Replace
                   </Button>
@@ -334,34 +312,25 @@ export function HeroSectionEditor({ initialData }: HeroSectionEditorProps) {
         </div>
       </section>
 
-      <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              {dialogType === 'logo'
-                ? 'Replace Logo'
-                : 'Change Background Image'}
-            </AlertDialogTitle>
+      <ImageUploadDialog
+        open={logoDialogOpen}
+        onOpenChange={setLogoDialogOpen}
+        onUpload={handleLogoUpload}
+        existingUrl={state.logoUrl}
+        title='Upload company logo'
+        description='Select a logo file from your computer'
+        allowedFormats={['image/png', 'image/svg+xml', 'image/webp']}
+      />
 
-            <AlertDialogDescription>
-              Paste the image URL you want to apply.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-
-          <input
-            autoFocus
-            value={dialogUrl}
-            onChange={(e) => setDialogUrl(e.target.value)}
-            className='mt-4 w-full rounded-md border bg-background p-2 text-sm outline-none'
-            placeholder='Paste image URL…'
-          />
-
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={submitDialog}>Save</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ImageUploadDialog
+        open={backgroundDialogOpen}
+        onOpenChange={setBackgroundDialogOpen}
+        onUpload={handleBackgroundUpload}
+        existingUrl={state.heroBackgroundUrl}
+        title='Upload hero background image'
+        description='Select a high-resolution image for your hero section'
+        allowedFormats={['image/jpeg', 'image/png', 'image/webp']}
+      />
     </>
   )
 }
