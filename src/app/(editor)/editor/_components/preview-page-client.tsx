@@ -1,27 +1,45 @@
 'use client'
 
 import { DeviceSwitcher } from '@/components/ui/device-switcher'
-import type { LifeSection } from '@/types/database'
+import type {
+  Job,
+  LifeSection,
+  Location,
+  Perk,
+  Testimonial,
+  ValueItem,
+} from '@/types/database'
 import { useState } from 'react'
 import type { HeroEditorInitialData } from './editor-page-client'
 import { HeroSectionPreview } from './hero-section-preview'
+import { JobsPreview } from './jobs-preview'
 import { LifeSectionPreview } from './life-section-preview'
+import { LocationsPreview } from './locations-preview'
+import { PerksPreview } from './perks-preview'
+import { TestimonialsPreview } from './testimonials-preview'
+import { ValueItemsPreview } from './value-items-preview'
 
 type DeviceMode = 'desktop' | 'tablet' | 'mobile'
-
-type PreviewPageClientProps = {
-  heroData: HeroEditorInitialData
-  lifeData: LifeSection
-}
 
 export function PreviewPageClient({
   heroData,
   lifeData,
-}: PreviewPageClientProps) {
-  console.warn(lifeData)
+  testimonialsData,
+  valueItemsData,
+  locationsData,
+  perksData,
+  jobsData,
+}: {
+  heroData: HeroEditorInitialData
+  lifeData: LifeSection
+  testimonialsData: Testimonial[]
+  valueItemsData: ValueItem[]
+  locationsData: Location[]
+  perksData: Perk[]
+  jobsData: Job[]
+}) {
   const [device, setDevice] = useState<DeviceMode>('desktop')
-
-  const frameWidth =
+  const frame =
     device === 'desktop'
       ? 'w-full'
       : device === 'tablet'
@@ -29,15 +47,21 @@ export function PreviewPageClient({
       : 'w-[390px]'
 
   return (
-    <div className='relative flex min-h-screen flex-col bg-slate-950'>
-      <div className='absolute top-6 right-8 z-20'>
+    <div className='relative h-full min-h-screen bg-slate-950 flex flex-col'>
+      <div className='absolute right-6 top-6 z-20'>
         <DeviceSwitcher value={device} onChange={setDevice} />
       </div>
-      <div className='flex flex-1 items-center justify-center '>
+
+      <div className='flex-1 flex items-center justify-center '>
         <div
-          className={`relative ${frameWidth} max-w-full overflow-hidden rounded-xl border border-slate-800 bg-slate-900 shadow-2xl`}>
+          className={`${frame} rounded-xl overflow-hidden shadow-2xl border border-slate-800 bg-slate-900`}>
           <HeroSectionPreview data={heroData} device={device} />
           <LifeSectionPreview data={lifeData} device={device} />
+          <ValueItemsPreview data={valueItemsData} device={device} />
+          <TestimonialsPreview data={testimonialsData} device={device} />
+          <LocationsPreview data={locationsData} device={device} />
+          <PerksPreview data={perksData} device={device} />
+          <JobsPreview data={jobsData} device={device} />
         </div>
       </div>
     </div>

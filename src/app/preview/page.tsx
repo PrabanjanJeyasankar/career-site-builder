@@ -4,15 +4,34 @@ import { PreviewPageClient } from '@/app/(editor)/editor/_components/preview-pag
 import { getCurrentCompanyName } from '@/lib/db/company'
 import {
   getCompanyProfileForCurrentCompany,
+  getJobsForCurrentCompany,
   getLifeSectionForCurrentCompany,
+  getLocationsForCurrentCompany,
+  getPerksForCurrentCompany,
+  getTestimonialsForCurrentCompany,
+  getValueItemsForCurrentCompany,
 } from '@/lib/db/fetchSectionData'
 import type { LifeSection } from '@/types/database'
 
 export default async function PreviewPage() {
-  const [companyResult, profileResult, lifeResult] = await Promise.allSettled([
+  const [
+    companyResult,
+    profileResult,
+    lifeResult,
+    testimonialsResult,
+    valueItemsResult,
+    locationsResult,
+    perksResult,
+    jobsResult,
+  ] = await Promise.allSettled([
     getCurrentCompanyName(),
     getCompanyProfileForCurrentCompany(),
     getLifeSectionForCurrentCompany(),
+    getTestimonialsForCurrentCompany(),
+    getValueItemsForCurrentCompany(),
+    getLocationsForCurrentCompany(),
+    getPerksForCurrentCompany(),
+    getJobsForCurrentCompany(),
   ])
 
   const companyName =
@@ -32,6 +51,15 @@ export default async function PreviewPage() {
           updated_at: '',
         }
 
+  const testimonials =
+    testimonialsResult.status === 'fulfilled' ? testimonialsResult.value : []
+  const valueItems =
+    valueItemsResult.status === 'fulfilled' ? valueItemsResult.value : []
+  const locations =
+    locationsResult.status === 'fulfilled' ? locationsResult.value : []
+  const perks = perksResult.status === 'fulfilled' ? perksResult.value : []
+  const jobs = jobsResult.status === 'fulfilled' ? jobsResult.value : []
+
   const heroData = {
     companyName,
     logoUrl: profile?.logo_url ?? '',
@@ -49,5 +77,15 @@ export default async function PreviewPage() {
     primaryColor: profile?.primary_color ?? '#059669',
   }
 
-  return <PreviewPageClient heroData={heroData} lifeData={life} />
+  return (
+    <PreviewPageClient
+      heroData={heroData}
+      lifeData={life}
+      testimonialsData={testimonials}
+      valueItemsData={valueItems}
+      locationsData={locations}
+      perksData={perks}
+      jobsData={jobs}
+    />
+  )
 }

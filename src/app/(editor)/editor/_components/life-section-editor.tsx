@@ -93,38 +93,43 @@ export function LifeSectionEditor({ initial }: EditorProps) {
   }, [editingSecondary])
 
   return (
-    <section className='w-full py-20'>
-      {/* CENTERED HEADING */}
-      <div className='mx-auto max-w-3xl px-6 mb-6 text-center pb-8'>
-        <div onClick={(e) => e.detail === 2 && setEditingHeading(true)}>
-          {editingHeading ? (
-            <input
-              ref={headingRef}
-              value={data.heading ?? ''}
-              onChange={(e) => setData({ ...data, heading: e.target.value })}
-              onBlur={() => {
-                save({ heading: data.heading })
-                setEditingHeading(false)
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
+    <section className='w-full bg-background py-16'>
+      <div className='mx-auto max-w-5xl px-4'>
+        <div className='mb-12 max-w-3xl space-y-3'>
+          <span className='text-[0.7rem] font-medium uppercase tracking-[0.2em] text-primary'>
+            Culture
+          </span>
+          <div onClick={(e) => e.detail === 2 && setEditingHeading(true)}>
+            {editingHeading ? (
+              <input
+                ref={headingRef}
+                value={data.heading ?? ''}
+                onChange={(e) => setData({ ...data, heading: e.target.value })}
+                onBlur={() => {
                   save({ heading: data.heading })
                   setEditingHeading(false)
-                }
-              }}
-              className='w-full bg-transparent text-4xl font-semibold outline-none text-center'
-            />
-          ) : (
-            <h2 className='cursor-text text-4xl font-semibold text-gray-900'>
-              {data.heading || 'Life at your company'}
-            </h2>
-          )}
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    save({ heading: data.heading })
+                    setEditingHeading(false)
+                  }
+                }}
+                className='w-full bg-transparent text-2xl font-semibold tracking-tight text-foreground outline-none md:text-3xl'
+                placeholder='Life at your company'
+              />
+            ) : (
+              <h2 className='cursor-text text-2xl font-semibold tracking-tight text-foreground md:text-3xl'>
+                {data.heading || 'Life at your company'}
+              </h2>
+            )}
+          </div>
         </div>
       </div>
 
-      <div className='mx-auto max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-16 px-6 items-center'>
+      <div className='mx-auto grid max-w-5xl grid-cols-1 items-center gap-16 px-4 md:grid-cols-2'>
         {/* LEFT TEXT */}
-        <div className='space-y-8 leading-relaxed'>
+        <div className='space-y-6 leading-relaxed'>
           {/* PRIMARY DESCRIPTION */}
           <div onClick={(e) => e.detail === 2 && setEditingPrimary(true)}>
             {editingPrimary ? (
@@ -139,10 +144,11 @@ export function LifeSectionEditor({ initial }: EditorProps) {
                   setEditingPrimary(false)
                 }}
                 rows={3}
-                className='w-full bg-transparent text-lg text-gray-700 outline-none resize-none'
+                className='w-full resize-none bg-transparent text-sm text-muted-foreground outline-none md:text-base'
+                placeholder='Describe your workplace culture and environment.'
               />
             ) : (
-              <p className='cursor-text text-gray-700'>
+              <p className='cursor-text text-sm text-muted-foreground md:text-base'>
                 {data.description_primary ||
                   'Describe your workplace culture and environment.'}
               </p>
@@ -163,10 +169,11 @@ export function LifeSectionEditor({ initial }: EditorProps) {
                   setEditingSecondary(false)
                 }}
                 rows={3}
-                className='w-full bg-transparent text-gray-600 outline-none resize-none'
+                className='w-full resize-none bg-transparent text-xs text-muted-foreground outline-none md:text-sm'
+                placeholder='Describe mission, values, growth and opportunities.'
               />
             ) : (
-              <p className='cursor-text text-gray-700'>
+              <p className='cursor-text text-sm text-muted-foreground md:text-sm'>
                 {data.description_secondary ||
                   'Describe mission, values, growth and opportunities.'}
               </p>

@@ -234,6 +234,7 @@ export function HeroSectionEditor({ initialData }: HeroSectionEditorProps) {
                     }
                   }}
                   className='w-full bg-transparent text-center text-4xl font-semibold outline-none'
+                  placeholder='Add a hero title'
                 />
               ) : (
                 <h1 className='cursor-text text-5xl font-semibold'>
@@ -264,6 +265,7 @@ export function HeroSectionEditor({ initialData }: HeroSectionEditorProps) {
                     }
                   }}
                   className='w-full bg-transparent text-center text-lg outline-none'
+                  placeholder='Add a hero subtitle'
                 />
               ) : (
                 <p className='cursor-text text-xl font-medium text-white/90'>
@@ -295,6 +297,7 @@ export function HeroSectionEditor({ initialData }: HeroSectionEditorProps) {
                   }}
                   rows={4}
                   className='mx-auto w-full max-w-xl bg-transparent text-center outline-none'
+                  placeholder='Describe what makes your company and roles special.'
                 />
               ) : (
                 <p className='mx-auto max-w-xl cursor-text text-sm text-white/70 leading-relaxed'>
@@ -324,6 +327,7 @@ export function HeroSectionEditor({ initialData }: HeroSectionEditorProps) {
                     }
                   }}
                   className='h-10 rounded-md bg-white/10 px-4 text-white outline-none'
+                  placeholder='View jobs'
                 />
               ) : (
                 <Button
