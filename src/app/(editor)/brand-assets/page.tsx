@@ -1,6 +1,6 @@
 import { AlertTriangle, Palette } from 'lucide-react'
 
-import { BrandAssetsForm } from './_components/brand-assets-form'
+import { BrandAssetsForm } from './_components/BrandAssetsForm'
 
 import { getCurrentCompanyName } from '@/lib/db/company'
 import { getCompanyProfileForCurrentCompany } from '@/lib/db/fetchSectionData'

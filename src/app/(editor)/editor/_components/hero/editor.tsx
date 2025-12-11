@@ -147,19 +147,7 @@ export function HeroSectionEditor({ initialData }: HeroSectionEditorProps) {
           )}
         </div>
 
-        <div className='absolute inset-0 pointer-events-none'>
-          {state.heroBackgroundUrl && (
-            <Image
-              src={state.heroBackgroundUrl}
-              alt=''
-              fill
-              unoptimized
-              priority
-              sizes='(min-width: 1024px) 1200px, 100vw'
-              className='scale-110 object-cover blur-3xl opacity-80'
-            />
-          )}
-        </div>
+        <div className='absolute inset-0 pointer-events-none backdrop-blur-2xl bg-black/30' />
 
         <div className='relative flex min-h-[420px] flex-col items-center justify-center px-4 py-12'>
           <div className='absolute bottom-4 right-4 z-20 flex gap-2'>
@@ -208,12 +196,16 @@ export function HeroSectionEditor({ initialData }: HeroSectionEditorProps) {
           </div>
 
           <div className='z-20 mx-auto flex max-w-2xl flex-col items-center gap-8 text-center'>
-            <div onClick={(e) => e.detail === 2 && setIsEditingTitle(true)} className='w-full'>
+            <div
+              onClick={(e) => e.detail === 2 && setIsEditingTitle(true)}
+              className='w-full'>
               {isEditingTitle ? (
                 <input
                   ref={titleRef}
                   value={state.heroTitle}
-                  onChange={(e) => setState({ ...state, heroTitle: e.target.value })}
+                  onChange={(e) =>
+                    setState({ ...state, heroTitle: e.target.value })
+                  }
                   onBlur={() => {
                     saveAll({ heroTitle: state.heroTitle })
                     setIsEditingTitle(false)
@@ -234,12 +226,16 @@ export function HeroSectionEditor({ initialData }: HeroSectionEditorProps) {
               )}
             </div>
 
-            <div onClick={(e) => e.detail === 2 && setIsEditingSubtitle(true)} className='w-full'>
+            <div
+              onClick={(e) => e.detail === 2 && setIsEditingSubtitle(true)}
+              className='w-full'>
               {isEditingSubtitle ? (
                 <input
                   ref={subtitleRef}
                   value={state.heroSubtitle}
-                  onChange={(e) => setState({ ...state, heroSubtitle: e.target.value })}
+                  onChange={(e) =>
+                    setState({ ...state, heroSubtitle: e.target.value })
+                  }
                   onBlur={() => {
                     saveAll({ heroSubtitle: state.heroSubtitle })
                     setIsEditingSubtitle(false)
@@ -260,12 +256,16 @@ export function HeroSectionEditor({ initialData }: HeroSectionEditorProps) {
               )}
             </div>
 
-            <div onClick={(e) => e.detail === 2 && setIsEditingDescription(true)} className='w-full'>
+            <div
+              onClick={(e) => e.detail === 2 && setIsEditingDescription(true)}
+              className='w-full'>
               {isEditingDescription ? (
                 <textarea
                   ref={descriptionRef}
                   value={state.heroDescription}
-                  onChange={(e) => setState({ ...state, heroDescription: e.target.value })}
+                  onChange={(e) =>
+                    setState({ ...state, heroDescription: e.target.value })
+                  }
                   onBlur={() => {
                     saveAll({ heroDescription: state.heroDescription })
                     setIsEditingDescription(false)
@@ -282,7 +282,8 @@ export function HeroSectionEditor({ initialData }: HeroSectionEditorProps) {
                 />
               ) : (
                 <p className='mx-auto max-w-xl cursor-text text-sm leading-relaxed text-white/70'>
-                  {state.heroDescription || 'Describe what makes your company and roles special.'}
+                  {state.heroDescription ||
+                    'Describe what makes your company and roles special.'}
                 </p>
               )}
             </div>
@@ -292,7 +293,9 @@ export function HeroSectionEditor({ initialData }: HeroSectionEditorProps) {
                 <input
                   ref={ctaRef}
                   value={state.heroCtaLabel}
-                  onChange={(e) => setState({ ...state, heroCtaLabel: e.target.value })}
+                  onChange={(e) =>
+                    setState({ ...state, heroCtaLabel: e.target.value })
+                  }
                   onBlur={() => {
                     saveAll({ heroCtaLabel: state.heroCtaLabel })
                     setIsEditingCta(false)
@@ -309,7 +312,16 @@ export function HeroSectionEditor({ initialData }: HeroSectionEditorProps) {
               ) : (
                 <Button
                   size='lg'
-                  onClick={(e) => e.detail === 2 && setIsEditingCta(true)}
+                  onClick={(e) => {
+                    if (e.detail === 2) {
+                      setIsEditingCta(true)
+                    } else {
+                      document.getElementById('jobs')?.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start',
+                      })
+                    }
+                  }}
                   style={{ backgroundColor: initialData.primaryColor }}
                   className='rounded-md px-6 text-sm font-semibold text-white shadow-md hover:opacity-90'>
                   {state.heroCtaLabel || 'View jobs'}
@@ -326,10 +338,14 @@ export function HeroSectionEditor({ initialData }: HeroSectionEditorProps) {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {dialogType === 'logo' ? 'Replace Logo' : 'Change Background Image'}
+              {dialogType === 'logo'
+                ? 'Replace Logo'
+                : 'Change Background Image'}
             </AlertDialogTitle>
 
-            <AlertDialogDescription>Paste the image URL you want to apply.</AlertDialogDescription>
+            <AlertDialogDescription>
+              Paste the image URL you want to apply.
+            </AlertDialogDescription>
           </AlertDialogHeader>
 
           <input

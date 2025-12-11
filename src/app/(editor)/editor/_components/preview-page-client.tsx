@@ -1,6 +1,10 @@
 'use client'
 
 import { DeviceSwitcher } from '@/components/ui/device-switcher'
+import {
+  normalizeSectionOrder,
+  type SectionKey,
+} from '@/hooks/use-section-order'
 import type {
   Job,
   LifeSection,
@@ -9,7 +13,6 @@ import type {
   Testimonial,
   ValueItem,
 } from '@/types/database'
-import { normalizeSectionOrder, type SectionKey } from '@/hooks/use-section-order'
 import { CSSProperties, useState } from 'react'
 import type { HeroEditorInitialData } from './editor-page-client'
 import { HeroSectionPreview } from './hero/preview'
@@ -75,7 +78,9 @@ export function PreviewPageClient({
             locationsData={locationsData}
             perksData={perksData}
           />
-          <JobsPreview data={jobsData} device={device} />
+          <div id='jobs'>
+            <JobsPreview data={jobsData} device={device} />
+          </div>
         </div>
       </div>
     </div>

@@ -66,7 +66,8 @@ export function HeroSectionPreview({ data, device }: HeroSectionPreviewProps) {
         )}
       </div>
 
-      <div className={`relative flex flex-col items-center justify-center px-4 py-10 ${sizes.height}`}>
+      <div
+        className={`relative flex flex-col items-center justify-center px-4 py-10 ${sizes.height}`}>
         <div className='mb-4'>
           {data.logoUrl ? (
             <Image
@@ -77,7 +78,8 @@ export function HeroSectionPreview({ data, device }: HeroSectionPreviewProps) {
               className={`${sizes.logo} rounded-full object-contain`}
             />
           ) : (
-            <div className={`${sizes.logo} flex items-center justify-center rounded-full border border-white/30 bg-white/10 text-xs`}>
+            <div
+              className={`${sizes.logo} flex items-center justify-center rounded-full border border-white/30 bg-white/10 text-xs`}>
               Logo
             </div>
           )}
@@ -85,12 +87,20 @@ export function HeroSectionPreview({ data, device }: HeroSectionPreviewProps) {
 
         <div className={`flex flex-col items-center text-center ${sizes.gap}`}>
           <h1 className={`${sizes.title} font-semibold`}>{data.heroTitle}</h1>
-          <p className={`${sizes.subtitle} text-white/80`}>{data.heroSubtitle}</p>
+          <p className={`${sizes.subtitle} text-white/80`}>
+            {data.heroSubtitle}
+          </p>
           <p className={`${sizes.description} max-w-xl text-white/80`}>
             {data.heroDescription}
           </p>
 
           <Button
+            onClick={() => {
+              document.getElementById('jobs')?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start',
+              })
+            }}
             style={{ backgroundColor: data.primaryColor }}
             className='mt-2 rounded-md px-6 text-sm font-semibold text-white shadow-md'>
             {data.heroCtaLabel}
