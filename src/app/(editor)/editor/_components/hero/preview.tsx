@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button'
 import type { DeviceType } from '@/components/ui/device-switcher'
 import Image from 'next/image'
-import type { HeroEditorInitialData } from './editor-page-client'
+import type { HeroEditorInitialData } from '../editor-page-client'
 
 type HeroSectionPreviewProps = {
   data: HeroEditorInitialData
@@ -39,7 +39,7 @@ export function HeroSectionPreview({ data, device }: HeroSectionPreviewProps) {
   }[device]
 
   return (
-    <section className='relative bg-gray-900 text-white overflow-hidden'>
+    <section className='relative overflow-hidden bg-gray-900 text-white'>
       <div className='absolute inset-0 pointer-events-none'>
         {data.heroBackgroundUrl && (
           <>
@@ -49,6 +49,7 @@ export function HeroSectionPreview({ data, device }: HeroSectionPreviewProps) {
               fill
               unoptimized
               priority
+              sizes='(min-width: 1024px) 1200px, 100vw'
               className='object-cover'
             />
             <Image
@@ -57,6 +58,7 @@ export function HeroSectionPreview({ data, device }: HeroSectionPreviewProps) {
               fill
               unoptimized
               priority
+              sizes='(min-width: 1024px) 1200px, 100vw'
               className='scale-110 object-cover blur-3xl opacity-80'
             />
             <div className='absolute inset-0 bg-gradient-to-b from-black/40 via-black/10 to-black/60' />
@@ -64,8 +66,7 @@ export function HeroSectionPreview({ data, device }: HeroSectionPreviewProps) {
         )}
       </div>
 
-      <div
-        className={`relative flex flex-col items-center justify-center px-4 py-10 ${sizes.height}`}>
+      <div className={`relative flex flex-col items-center justify-center px-4 py-10 ${sizes.height}`}>
         <div className='mb-4'>
           {data.logoUrl ? (
             <Image
@@ -76,8 +77,7 @@ export function HeroSectionPreview({ data, device }: HeroSectionPreviewProps) {
               className={`${sizes.logo} rounded-full object-contain`}
             />
           ) : (
-            <div
-              className={`${sizes.logo} rounded-full border border-white/30 bg-white/10 flex items-center justify-center text-xs`}>
+            <div className={`${sizes.logo} flex items-center justify-center rounded-full border border-white/30 bg-white/10 text-xs`}>
               Logo
             </div>
           )}
@@ -85,16 +85,14 @@ export function HeroSectionPreview({ data, device }: HeroSectionPreviewProps) {
 
         <div className={`flex flex-col items-center text-center ${sizes.gap}`}>
           <h1 className={`${sizes.title} font-semibold`}>{data.heroTitle}</h1>
-          <p className={`${sizes.subtitle} text-white/80`}>
-            {data.heroSubtitle}
-          </p>
-          <p className={`${sizes.description} text-white/80 max-w-xl`}>
+          <p className={`${sizes.subtitle} text-white/80`}>{data.heroSubtitle}</p>
+          <p className={`${sizes.description} max-w-xl text-white/80`}>
             {data.heroDescription}
           </p>
 
           <Button
             style={{ backgroundColor: data.primaryColor }}
-            className='mt-2 px-6 text-sm font-semibold text-white rounded-md shadow-md'>
+            className='mt-2 rounded-md px-6 text-sm font-semibold text-white shadow-md'>
             {data.heroCtaLabel}
           </Button>
         </div>

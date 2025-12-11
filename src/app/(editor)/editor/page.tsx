@@ -10,11 +10,13 @@ import {
   getJobsForCurrentCompany,
   getLifeSectionForCurrentCompany,
   getLocationsForCurrentCompany,
+  getSectionOrderForCurrentCompany,
   getPerksForCurrentCompany,
   getTestimonialsForCurrentCompany,
   getValueItemsForCurrentCompany,
 } from '@/lib/db/fetchSectionData'
 import { LifeSection } from '@/types/database'
+import { redirect } from 'next/navigation'
 
 export default async function EditorPage() {
   const [
@@ -26,6 +28,7 @@ export default async function EditorPage() {
     locationsResult,
     perksResult,
     jobsResult,
+    sectionOrderResult,
   ] = await Promise.allSettled([
     getCurrentCompanyName(),
     getCompanyProfileForCurrentCompany(),
@@ -35,6 +38,7 @@ export default async function EditorPage() {
     getLocationsForCurrentCompany(),
     getPerksForCurrentCompany(),
     getJobsForCurrentCompany(),
+    getSectionOrderForCurrentCompany(),
   ])
 
   const companyName =
@@ -63,6 +67,10 @@ export default async function EditorPage() {
     locationsResult.status === 'fulfilled' ? locationsResult.value : []
   const perks = perksResult.status === 'fulfilled' ? perksResult.value : []
   const jobs = jobsResult.status === 'fulfilled' ? jobsResult.value : []
+  const sectionOrder =
+    sectionOrderResult.status === 'fulfilled'
+      ? sectionOrderResult.value?.section_order ?? null
+      : null
 
   const heroData: HeroEditorInitialData = {
     companyName,
@@ -82,7 +90,12 @@ export default async function EditorPage() {
     secondaryColor: profile?.secondary_color ?? '#f5f5f5',
   }
 
-  const companyId = await getCurrentUserCompanyId()
+  const companyId = await getCurrentUserCompanyId().catch(() => null)
+
+  if (!companyId) {
+    redirect('/brand-assets')
+  }
+
   const previewUrl = `/preview/${companyId}`
 
   return (
@@ -94,6 +107,7 @@ export default async function EditorPage() {
       locationsData={locations}
       perksData={perks}
       jobsData={jobs}
+      sectionOrder={sectionOrder}
       previewUrl={previewUrl}
     />
   )

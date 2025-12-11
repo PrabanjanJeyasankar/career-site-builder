@@ -4,8 +4,9 @@ import type { DeviceType } from '@/components/ui/device-switcher'
 import type { Job } from '@/types/database'
 import { ExternalLink } from 'lucide-react'
 import { useMemo, useState } from 'react'
-import { JobFilters } from './job-filters'
-import { SectionHeading } from './section-heading'
+
+import { JobFilters } from '../job-filters'
+import { SectionHeading } from '../section-heading'
 
 type JobsPreviewProps = {
   data: Job[]
@@ -118,7 +119,7 @@ export function JobsPreview({ data, device }: JobsPreviewProps) {
 
   return (
     <section className={`w-full bg-background ${sizes.section}`}>
-      <div className='mx-auto max-w-5xl px-4'>
+      <div className='mx-auto max-w-6xl px-4'>
         <div className='mb-10 flex items-baseline justify-between gap-4'>
           <SectionHeading
             eyebrow='Open roles'

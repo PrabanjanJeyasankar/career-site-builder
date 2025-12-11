@@ -2,8 +2,8 @@
 
 import type { DeviceType } from '@/components/ui/device-switcher'
 import type { ValueItem } from '@/types/database'
-import { SectionHeading } from './section-heading'
-import { ValuePerkPreviewCard } from './value-perk-preview-card'
+import { SectionHeading } from '../section-heading'
+import { ValuePerkPreviewCard } from '../value-perk-preview-card'
 
 type ValueItemsPreviewProps = {
   data: ValueItem[]
@@ -47,7 +47,7 @@ export function ValueItemsPreview({
 
   return (
     <section className={`w-full bg-background ${sizes.section}`}>
-      <div className='mx-auto max-w-5xl px-4'>
+      <div className='mx-auto max-w-6xl px-4'>
         <div className='mb-16 flex items-baseline justify-between gap-4'>
           <SectionHeading
             eyebrow='Values'

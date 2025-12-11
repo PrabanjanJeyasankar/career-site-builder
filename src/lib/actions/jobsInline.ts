@@ -173,3 +173,108 @@ export async function createJobInline(input: {
     }
   }
 }
+
+type CsvJobPayload = {
+  title: string
+  department: string
+  location: string
+  work_type: 'remote' | 'hybrid' | 'onsite'
+  employment_type: 'full-time' | 'part-time' | 'contract' | 'internship'
+  description: string
+  apply_url: string
+  posted_at?: string
+}
+
+export async function importJobsFromCsv(rows: CsvJobPayload[]) {
+  try {
+    const supabase = await createSupabaseServerClientForActions()
+    const companyId = await getCurrentUserCompanyId()
+
+    if (!companyId) {
+      throw new Error('Company ID is required but not found')
+    }
+
+    if (!rows.length) {
+      throw new Error('No rows to import')
+    }
+
+    const allowedWorkTypes = ['remote', 'hybrid', 'onsite'] as const
+    const allowedEmploymentTypes = [
+      'full-time',
+      'part-time',
+      'contract',
+      'internship',
+    ] as const
+
+    const normalizeWorkType = (value: string) => {
+      const normalized = value.toLowerCase().replace(/\s+/g, '-')
+      const mapped = normalized === 'on-site' ? 'onsite' : normalized
+      if (allowedWorkTypes.includes(mapped as (typeof allowedWorkTypes)[number]))
+        return mapped as (typeof allowedWorkTypes)[number]
+      throw new Error(
+        `Invalid work_type "${value}". Use remote, hybrid, or onsite.`
+      )
+    }
+
+    const normalizeEmploymentType = (value: string) => {
+      const normalized = value.toLowerCase().replace(/\s+/g, '-')
+      if (
+        allowedEmploymentTypes.includes(
+          normalized as (typeof allowedEmploymentTypes)[number]
+        )
+      )
+        return normalized as (typeof allowedEmploymentTypes)[number]
+      throw new Error(
+        `Invalid employment_type "${value}". Use full-time, part-time, contract, or internship.`
+      )
+    }
+
+    const payload: (CsvJobPayload & { company_id: string })[] = rows.map(
+      (row, index) => {
+        const title = row.title?.trim()
+        const department = row.department?.trim()
+        const location = row.location?.trim()
+        const description = row.description?.trim()
+        const applyUrl = row.apply_url?.trim()
+
+        if (!title) throw new Error(`Row ${index + 1}: title is required`)
+        if (!department)
+          throw new Error(`Row ${index + 1}: department is required`)
+        if (!location) throw new Error(`Row ${index + 1}: location is required`)
+        if (!description)
+          throw new Error(`Row ${index + 1}: description is required`)
+        if (!applyUrl) throw new Error(`Row ${index + 1}: apply_url is required`)
+
+        return {
+          company_id: companyId,
+          title,
+          department,
+          location,
+          work_type: normalizeWorkType(row.work_type),
+          employment_type: normalizeEmploymentType(row.employment_type),
+          description,
+          apply_url: applyUrl,
+          posted_at: new Date().toISOString(),
+        }
+      }
+    )
+
+    const result = await supabase
+      .from('jobs')
+      .insert(payload)
+      .select()
+
+    if (result.error) {
+      console.error('Database error:', result.error)
+      throw new Error(`Database operation failed: ${result.error.message}`)
+    }
+
+    return { success: true, data: result.data }
+  } catch (error) {
+    console.error('importJobsFromCsv error:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error occurred',
+    }
+  }
+}

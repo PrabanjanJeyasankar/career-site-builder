@@ -39,7 +39,7 @@ export function LifeSectionPreview({ data, device }: LifeSectionPreviewProps) {
 
   return (
     <section className={`w-full bg-background ${sizes.section}`}>
-      <div className='mx-auto max-w-5xl px-4 mb-12'>
+      <div className='mx-auto max-w-6xl px-4 mb-12'>
         <div className='space-y-3'>
           <span className='text-[0.7rem] font-medium uppercase tracking-[0.2em] text-primary'>
             Culture
@@ -51,7 +51,7 @@ export function LifeSectionPreview({ data, device }: LifeSectionPreviewProps) {
         </div>
       </div>
 
-      <div className={`mx-auto max-w-5xl px-4 items-center ${sizes.grid}`}>
+      <div className={`mx-auto max-w-6xl px-4 items-center ${sizes.grid}`}>
         <div className='space-y-6 leading-relaxed'>
           <p className={`${sizes.primary} text-muted-foreground`}>
             {data.description_primary ||

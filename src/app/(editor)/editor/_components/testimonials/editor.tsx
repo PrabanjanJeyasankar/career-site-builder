@@ -20,9 +20,9 @@ import type { Testimonial } from '@/types/database'
 import { Plus, Replace } from 'lucide-react'
 import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
-import { InlineDeleteButton } from './inline-delete-button'
-import { SectionHeading } from './section-heading'
-import { TestimonialLayout } from './testimonial-layout'
+import { InlineDeleteButton } from '../inline-delete-button'
+import { SectionHeading } from '../section-heading'
+import { TestimonialLayout } from './layout'
 
 type EditorProps = {
   initial: Testimonial[]

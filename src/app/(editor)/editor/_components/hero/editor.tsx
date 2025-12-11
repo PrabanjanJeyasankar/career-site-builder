@@ -18,7 +18,7 @@ import {
 } from '@/components/ui/alert-dialog'
 
 import { ImageIcon, Replace } from 'lucide-react'
-import type { HeroEditorInitialData } from './editor-page-client'
+import type { HeroEditorInitialData } from '../editor-page-client'
 
 type HeroSectionEditorProps = {
   initialData: HeroEditorInitialData
@@ -132,11 +132,7 @@ export function HeroSectionEditor({ initialData }: HeroSectionEditorProps) {
 
   return (
     <>
-      {/* Floating Helper Button */}
-
-      {/* Main Editor */}
       <section className='relative overflow-hidden rounded-none border-none bg-gray-900 text-white shadow-lg'>
-        {/* BACKGROUND LAYER (pointer-events disabled) */}
         <div className='absolute inset-0 pointer-events-none'>
           {state.heroBackgroundUrl && (
             <Image
@@ -145,12 +141,12 @@ export function HeroSectionEditor({ initialData }: HeroSectionEditorProps) {
               fill
               unoptimized
               priority
+              sizes='(min-width: 1024px) 1200px, 100vw'
               className='object-cover'
             />
           )}
         </div>
 
-        {/* BLUR & GRADIENT LAYER (pointer-events disabled) */}
         <div className='absolute inset-0 pointer-events-none'>
           {state.heroBackgroundUrl && (
             <Image
@@ -159,14 +155,14 @@ export function HeroSectionEditor({ initialData }: HeroSectionEditorProps) {
               fill
               unoptimized
               priority
+              sizes='(min-width: 1024px) 1200px, 100vw'
               className='scale-110 object-cover blur-3xl opacity-80'
             />
           )}
         </div>
 
         <div className='relative flex min-h-[420px] flex-col items-center justify-center px-4 py-12'>
-          {/* CHANGE BACKGROUND BUTTON */}
-          <div className='absolute bottom-4 right-4 flex gap-2 z-20'>
+          <div className='absolute bottom-4 right-4 z-20 flex gap-2'>
             <Button
               variant='outline'
               size='sm'
@@ -177,9 +173,8 @@ export function HeroSectionEditor({ initialData }: HeroSectionEditorProps) {
             </Button>
           </div>
 
-          {/* LOGO */}
           <div
-            className='mb-6 flex items-center justify-center z-20'
+            className='z-20 mb-6 flex items-center justify-center'
             onMouseEnter={() => setIsHoveringLogo(true)}
             onMouseLeave={() => setIsHoveringLogo(false)}>
             <div className='relative'>
@@ -198,7 +193,7 @@ export function HeroSectionEditor({ initialData }: HeroSectionEditorProps) {
               )}
 
               {isHoveringLogo && (
-                <div className='absolute inset-0 flex items-center justify-center rounded-full bg-black/40 z-30'>
+                <div className='absolute inset-0 z-30 flex items-center justify-center rounded-full bg-black/40'>
                   <Button
                     size='sm'
                     variant='secondary'
@@ -212,17 +207,13 @@ export function HeroSectionEditor({ initialData }: HeroSectionEditorProps) {
             </div>
           </div>
 
-          <div className='mx-auto flex max-w-2xl flex-col items-center gap-8 text-center z-20'>
-            <div
-              onClick={(e) => e.detail === 2 && setIsEditingTitle(true)}
-              className='w-full'>
+          <div className='z-20 mx-auto flex max-w-2xl flex-col items-center gap-8 text-center'>
+            <div onClick={(e) => e.detail === 2 && setIsEditingTitle(true)} className='w-full'>
               {isEditingTitle ? (
                 <input
                   ref={titleRef}
                   value={state.heroTitle}
-                  onChange={(e) =>
-                    setState({ ...state, heroTitle: e.target.value })
-                  }
+                  onChange={(e) => setState({ ...state, heroTitle: e.target.value })}
                   onBlur={() => {
                     saveAll({ heroTitle: state.heroTitle })
                     setIsEditingTitle(false)
@@ -243,17 +234,12 @@ export function HeroSectionEditor({ initialData }: HeroSectionEditorProps) {
               )}
             </div>
 
-            {/* SUBTITLE */}
-            <div
-              onClick={(e) => e.detail === 2 && setIsEditingSubtitle(true)}
-              className='w-full'>
+            <div onClick={(e) => e.detail === 2 && setIsEditingSubtitle(true)} className='w-full'>
               {isEditingSubtitle ? (
                 <input
                   ref={subtitleRef}
                   value={state.heroSubtitle}
-                  onChange={(e) =>
-                    setState({ ...state, heroSubtitle: e.target.value })
-                  }
+                  onChange={(e) => setState({ ...state, heroSubtitle: e.target.value })}
                   onBlur={() => {
                     saveAll({ heroSubtitle: state.heroSubtitle })
                     setIsEditingSubtitle(false)
@@ -274,17 +260,12 @@ export function HeroSectionEditor({ initialData }: HeroSectionEditorProps) {
               )}
             </div>
 
-            {/* DESCRIPTION */}
-            <div
-              onClick={(e) => e.detail === 2 && setIsEditingDescription(true)}
-              className='w-full'>
+            <div onClick={(e) => e.detail === 2 && setIsEditingDescription(true)} className='w-full'>
               {isEditingDescription ? (
                 <textarea
                   ref={descriptionRef}
                   value={state.heroDescription}
-                  onChange={(e) =>
-                    setState({ ...state, heroDescription: e.target.value })
-                  }
+                  onChange={(e) => setState({ ...state, heroDescription: e.target.value })}
                   onBlur={() => {
                     saveAll({ heroDescription: state.heroDescription })
                     setIsEditingDescription(false)
@@ -300,22 +281,18 @@ export function HeroSectionEditor({ initialData }: HeroSectionEditorProps) {
                   placeholder='Describe what makes your company and roles special.'
                 />
               ) : (
-                <p className='mx-auto max-w-xl cursor-text text-sm text-white/70 leading-relaxed'>
-                  {state.heroDescription ||
-                    'Describe what makes your company and roles special.'}
+                <p className='mx-auto max-w-xl cursor-text text-sm leading-relaxed text-white/70'>
+                  {state.heroDescription || 'Describe what makes your company and roles special.'}
                 </p>
               )}
             </div>
 
-            {/* CTA */}
             <div className='mt-4'>
               {isEditingCta ? (
                 <input
                   ref={ctaRef}
                   value={state.heroCtaLabel}
-                  onChange={(e) =>
-                    setState({ ...state, heroCtaLabel: e.target.value })
-                  }
+                  onChange={(e) => setState({ ...state, heroCtaLabel: e.target.value })}
                   onBlur={() => {
                     saveAll({ heroCtaLabel: state.heroCtaLabel })
                     setIsEditingCta(false)
@@ -349,14 +326,10 @@ export function HeroSectionEditor({ initialData }: HeroSectionEditorProps) {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {dialogType === 'logo'
-                ? 'Replace Logo'
-                : 'Change Background Image'}
+              {dialogType === 'logo' ? 'Replace Logo' : 'Change Background Image'}
             </AlertDialogTitle>
 
-            <AlertDialogDescription>
-              Paste the image URL you want to apply.
-            </AlertDialogDescription>
+            <AlertDialogDescription>Paste the image URL you want to apply.</AlertDialogDescription>
           </AlertDialogHeader>
 
           <input

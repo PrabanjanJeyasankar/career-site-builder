@@ -17,6 +17,10 @@ export async function saveCompanyProfile(
   const supabase = await createSupabaseServerClientForActions()
   const companyId = await getCurrentUserCompanyId()
 
+   if (!companyId) {
+    return { error: 'User is not associated with any company' }
+  }
+
   const parsed = companyProfileFormSchema.parse(values)
   const payload = normalizeCompanyProfilePayload(parsed)
 
@@ -89,6 +93,10 @@ export async function saveHeroSectionInline(
 ): Promise<{ error?: string; success?: boolean }> {
   const supabase = await createSupabaseServerClientForActions()
   const companyId = await getCurrentUserCompanyId()
+
+  if (!companyId) {
+    return { error: 'User is not associated with any company' }
+  }
 
   const payload = heroInlineUpdateSchema.parse(input)
 

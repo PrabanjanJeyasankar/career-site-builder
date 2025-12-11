@@ -98,6 +98,12 @@ export interface Job {
   updated_at: string
 }
 
+export interface SectionOrder {
+  company_id: string
+  section_order: string[]
+  updated_at: string
+}
+
 // Helper types
 export type UserRole = 'owner' | 'admin' | 'editor'
 export type WorkType = 'remote' | 'hybrid' | 'onsite'

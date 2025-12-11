@@ -7,6 +7,7 @@ import {
   getJobsByCompanyId,
   getLifeSectionByCompanyId,
   getLocationsByCompanyId,
+  getSectionOrderByCompanyId,
   getPerksByCompanyId,
   getTestimonialsByCompanyId,
   getValueItemsByCompanyId,
@@ -36,6 +37,7 @@ export default async function PreviewPage({ params }: PreviewPageProps) {
     locationsResult,
     perksResult,
     jobsResult,
+    sectionOrderResult,
   ] = await Promise.allSettled([
     getCompanyNameById(companyId),
     getCompanyProfileByCompanyId(companyId),
@@ -45,6 +47,7 @@ export default async function PreviewPage({ params }: PreviewPageProps) {
     getLocationsByCompanyId(companyId),
     getPerksByCompanyId(companyId),
     getJobsByCompanyId(companyId),
+    getSectionOrderByCompanyId(companyId),
   ])
 
   const companyName =
@@ -80,6 +83,10 @@ export default async function PreviewPage({ params }: PreviewPageProps) {
     locationsResult.status === 'fulfilled' ? locationsResult.value : []
   const perks = perksResult.status === 'fulfilled' ? perksResult.value : []
   const jobs = jobsResult.status === 'fulfilled' ? jobsResult.value : []
+  const sectionOrder =
+    sectionOrderResult.status === 'fulfilled'
+      ? sectionOrderResult.value?.section_order ?? null
+      : null
 
   const heroData = {
     companyName,
@@ -108,6 +115,7 @@ export default async function PreviewPage({ params }: PreviewPageProps) {
       locationsData={locations}
       perksData={perks}
       jobsData={jobs}
+      sectionOrder={sectionOrder}
     />
   )
 }

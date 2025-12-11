@@ -26,8 +26,7 @@ export function InlineDeleteButton({
         'h-7 w-7 p-0 text-muted-foreground hover:text-destructive',
         className
       )}>
-      <Trash className='h-4 w-4' />
+      <Trash className='h-4 w-4 text-red-400' />
     </Button>
   )
 }
-

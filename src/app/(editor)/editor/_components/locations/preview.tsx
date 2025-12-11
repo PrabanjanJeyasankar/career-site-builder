@@ -4,7 +4,7 @@ import type { DeviceType } from '@/components/ui/device-switcher'
 import type { Location } from '@/types/database'
 import { MapPin } from 'lucide-react'
 import Image from 'next/image'
-import { SectionHeading } from './section-heading'
+import { SectionHeading } from '../section-heading'
 
 type LocationsPreviewProps = {
   data: Location[]
@@ -50,7 +50,7 @@ export function LocationsPreview({ data, device }: LocationsPreviewProps) {
 
   return (
     <section className={`w-full bg-background ${sizes.section}`}>
-      <div className='mx-auto max-w-5xl px-4'>
+      <div className='mx-auto max-w-6xl px-4'>
         <div className='mb-16 flex items-baseline justify-between gap-4'>
           <SectionHeading
             eyebrow='Locations'
@@ -70,6 +70,7 @@ export function LocationsPreview({ data, device }: LocationsPreviewProps) {
                     src={location.image_url}
                     alt={`${location.city}, ${location.country}`}
                     fill
+                    sizes='100vw'
                     className='object-cover'
                   />
                 ) : (

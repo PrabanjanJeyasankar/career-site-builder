@@ -6,6 +6,7 @@ import type {
   Job,
   LifeSection,
   Location,
+  SectionOrder,
   Perk,
   Testimonial,
   ValueItem,
@@ -15,6 +16,8 @@ import { getCurrentUserCompanyId } from './company'
 export async function getCompanyProfileForCurrentCompany(): Promise<CompanyProfile | null> {
   const supabase = await createSupabaseServerClient()
   const companyId = await getCurrentUserCompanyId()
+
+  if (!companyId) return null
 
   const { data, error } = await supabase
     .from('company_profile')
@@ -33,6 +36,8 @@ export async function getCompanyProfileForCurrentCompany(): Promise<CompanyProfi
 export async function getLifeSectionForCurrentCompany(): Promise<LifeSection | null> {
   const supabase = await createSupabaseServerClient()
   const companyId = await getCurrentUserCompanyId()
+
+  if (!companyId) return null
 
   const { data, error } = await supabase
     .from('life_section')
@@ -56,6 +61,8 @@ export async function getTestimonialsForCurrentCompany(): Promise<
   const supabase = await createSupabaseServerClient()
   const companyId = await getCurrentUserCompanyId()
 
+  if (!companyId) return []
+
   const { data, error } = await supabase
     .from('testimonials')
     .select('*')
@@ -73,6 +80,8 @@ export async function getTestimonialsForCurrentCompany(): Promise<
 export async function getValueItemsForCurrentCompany(): Promise<ValueItem[]> {
   const supabase = await createSupabaseServerClient()
   const companyId = await getCurrentUserCompanyId()
+
+  if (!companyId) return []
 
   const { data, error } = await supabase
     .from('value_items')
@@ -92,6 +101,8 @@ export async function getLocationsForCurrentCompany(): Promise<Location[]> {
   const supabase = await createSupabaseServerClient()
   const companyId = await getCurrentUserCompanyId()
 
+  if (!companyId) return []
+
   const { data, error } = await supabase
     .from('locations')
     .select('*')
@@ -110,6 +121,8 @@ export async function getPerksForCurrentCompany(): Promise<Perk[]> {
   const supabase = await createSupabaseServerClient()
   const companyId = await getCurrentUserCompanyId()
 
+  if (!companyId) return []
+
   const { data, error } = await supabase
     .from('perks')
     .select('*')
@@ -127,6 +140,8 @@ export async function getJobsForCurrentCompany(): Promise<Job[]> {
   const supabase = await createSupabaseServerClient()
   const companyId = await getCurrentUserCompanyId()
 
+  if (!companyId) return []
+
   const { data, error } = await supabase
     .from('jobs')
     .select('*')
@@ -139,6 +154,24 @@ export async function getJobsForCurrentCompany(): Promise<Job[]> {
   }
 
   return data as Job[]
+}
+
+export async function getSectionOrderForCurrentCompany(): Promise<SectionOrder | null> {
+  const supabase = await createSupabaseServerClient()
+  const companyId = await getCurrentUserCompanyId()
+
+  const { data, error } = await supabase
+    .from('company_section_order')
+    .select('*')
+    .eq('company_id', companyId)
+    .maybeSingle()
+
+  if (error && error.code !== 'PGRST116') {
+    console.error('Failed to fetch section order', error)
+    return null
+  }
+
+  return (data as SectionOrder) ?? null
 }
 
 // Public, company-id based fetchers used by the unauthenticated preview page.
@@ -271,4 +304,23 @@ export async function getJobsByCompanyId(companyId: string): Promise<Job[]> {
   }
 
   return (data as Job[]) ?? []
+}
+
+export async function getSectionOrderByCompanyId(
+  companyId: string
+): Promise<SectionOrder | null> {
+  const supabase = await createSupabaseServerClient()
+
+  const { data, error } = await supabase
+    .from('company_section_order')
+    .select('*')
+    .eq('company_id', companyId)
+    .maybeSingle()
+
+  if (error && error.code !== 'PGRST116') {
+    console.error('Failed to fetch section order by id', error)
+    return null
+  }
+
+  return (data as SectionOrder) ?? null
 }

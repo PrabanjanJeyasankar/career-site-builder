@@ -1,7 +1,7 @@
 // src/components/nav-projects.tsx
 'use client'
 
-import { Brush, Folder, Forward, MoreHorizontal, Trash2 } from 'lucide-react'
+import { Palette, Folder, Forward, MoreHorizontal, Trash2 } from 'lucide-react'
 
 import {
   DropdownMenu,
@@ -24,7 +24,7 @@ const projectItems = [
   {
     name: 'Brand Assets',
     url: '/brand-assets',
-    icon: Brush,
+    icon: Palette,
   },
 ]
 
@@ -39,7 +39,9 @@ export function NavProjects() {
           <SidebarMenuItem key={item.name}>
             <SidebarMenuButton asChild>
               <a href={item.url}>
-                <item.icon />
+                <span className='flex h-7 w-7 items-center justify-center rounded-md bg-primary/10 text-primary'>
+                  <item.icon className='h-4 w-4' />
+                </span>
                 <span>{item.name}</span>
               </a>
             </SidebarMenuButton>

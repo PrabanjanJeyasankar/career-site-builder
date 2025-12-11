@@ -6,6 +6,7 @@ import { NavMain } from '@/components/nav-main'
 import { NavProjects } from '@/components/nav-projects'
 import { NavUser } from '@/components/nav-user'
 import { TeamSwitcher } from '@/components/team-switcher'
+import { HelpDialog } from '@/components/help-dialog'
 import {
   Sidebar,
   SidebarContent,
@@ -40,6 +41,7 @@ export async function AppSidebar({
         <NavProjects />
       </SidebarContent>
       <SidebarFooter>
+        <HelpDialog />
         <NavUser
           user={{
             name: userData.name || 'User',

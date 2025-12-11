@@ -20,8 +20,9 @@ import type { Location } from '@/types/database'
 import { MapPin, Plus, Replace } from 'lucide-react'
 import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
-import { InlineDeleteButton } from './inline-delete-button'
-import { SectionHeading } from './section-heading'
+
+import { InlineDeleteButton } from '../inline-delete-button'
+import { SectionHeading } from '../section-heading'
 
 type EditorProps = {
   initial: Location[]
@@ -188,7 +189,9 @@ export function LocationsEditor({ initial }: EditorProps) {
               className='group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border/70 bg-card'>
               {/* Delete Button */}
               <div className='absolute top-4 right-4 z-10 opacity-0 group-hover:opacity-100 transition-opacity'>
-                <InlineDeleteButton onClick={() => deleteLocation(location.id)} />
+                <InlineDeleteButton
+                  onClick={() => deleteLocation(location.id)}
+                />
               </div>
 
               <div className='group/image relative h-40 w-full bg-chart-3/10'>
@@ -197,6 +200,7 @@ export function LocationsEditor({ initial }: EditorProps) {
                     src={location.image_url}
                     alt={`${location.city}, ${location.country}`}
                     fill
+                    sizes='100vw'
                     className='object-cover'
                   />
                 ) : (

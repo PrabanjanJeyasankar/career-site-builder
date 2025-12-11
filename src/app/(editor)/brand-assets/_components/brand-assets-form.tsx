@@ -2,7 +2,9 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Brush, Info, Megaphone, Share2 } from 'lucide-react'
-import { useState } from 'react'
+import { usePathname, useRouter } from 'next/navigation'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { HexColorPicker } from 'react-colorful'
 import { useForm, useWatch } from 'react-hook-form'
 
 import { saveCompanyProfile } from '@/lib/actions/companyProfile'
@@ -20,6 +22,14 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import {
@@ -40,17 +50,34 @@ export function BrandAssetsForm({
 }: BrandAssetsFormProps) {
   const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle')
   const [message, setMessage] = useState('')
+  const [showLeavePrompt, setShowLeavePrompt] = useState(false)
+  const pendingNavigation = useRef<() => void | undefined>(undefined)
+  const skipBlockRef = useRef(false)
+  const router = useRouter()
+  const pathname = usePathname()
+  const currentPathRef = useRef(pathname)
 
   const {
     register,
     handleSubmit,
     control,
     formState: { errors, isSubmitting, isDirty },
+    setValue,
     reset,
   } = useForm<CompanyProfileFormValues>({
     resolver: zodResolver(companyProfileFormSchema),
     defaultValues,
   })
+  const {
+    ref: primaryColorRef,
+    onChange: primaryColorOnChange,
+    ...primaryColorField
+  } = register('primary_color')
+  const {
+    ref: secondaryColorRef,
+    onChange: secondaryColorOnChange,
+    ...secondaryColorField
+  } = register('secondary_color')
 
   const primaryColor =
     useWatch({
@@ -62,26 +89,114 @@ export function BrandAssetsForm({
       control,
       name: 'secondary_color',
     }) || '#f5f5f5'
+  const [showPrimaryPicker, setShowPrimaryPicker] = useState(false)
+  const [showSecondaryPicker, setShowSecondaryPicker] = useState(false)
+  const pickerRef = useRef<HTMLDivElement | null>(null)
 
-  async function onSubmit(values: CompanyProfileFormValues) {
-    setStatus('idle')
-    setMessage('')
+  const onSubmitForm = useCallback(
+    async (values: CompanyProfileFormValues) => {
+      setStatus('idle')
+      setMessage('')
 
-    const result = await saveCompanyProfile(values)
-    if (result?.error) {
-      setStatus('error')
-      setMessage(result.error)
-      return
+      const result = await saveCompanyProfile(values)
+      if (result?.error) {
+        setStatus('error')
+        setMessage(result.error)
+        return
+      }
+
+      setStatus('success')
+      setMessage('Brand assets were saved successfully.')
+      reset(values)
+      setShowLeavePrompt(false)
+      if (pendingNavigation.current) {
+        const nav = pendingNavigation.current
+        pendingNavigation.current = undefined
+        skipBlockRef.current = true
+        nav()
+      }
+    },
+    [reset]
+  )
+
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isDirty) {
+        e.preventDefault()
+        e.returnValue = ''
+      }
+    }
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+  }, [isDirty])
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        pickerRef.current &&
+        !pickerRef.current.contains(event.target as Node)
+      ) {
+        setShowPrimaryPicker(false)
+        setShowSecondaryPicker(false)
+      }
+    }
+    if (showPrimaryPicker || showSecondaryPicker) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [showPrimaryPicker, showSecondaryPicker])
+
+  useEffect(() => {
+    currentPathRef.current = pathname
+  }, [pathname])
+
+  useEffect(() => {
+    function handleLinkClick(event: MouseEvent) {
+      const anchor = (event.target as HTMLElement)?.closest('a[href]')
+      if (!anchor) return
+      if (
+        (anchor as HTMLAnchorElement).target &&
+        (anchor as HTMLAnchorElement).target !== '_self'
+      )
+        return
+      const href = anchor.getAttribute('href')
+      if (!href) return
+      const url = new URL(href, window.location.href)
+      const samePath = url.pathname === pathname
+      if (samePath) return
+      if (!isDirty || skipBlockRef.current) return
+      event.preventDefault()
+      pendingNavigation.current = () =>
+        router.push(url.pathname + url.search + url.hash)
+      setShowLeavePrompt(true)
     }
 
-    setStatus('success')
-    setMessage('Brand assets were saved successfully.')
-    reset(values)
-  }
+    function handlePopState() {
+      if (!isDirty || skipBlockRef.current) return
+      const target =
+        window.location.pathname + window.location.search + window.location.hash
+      if (target === pathname) return
+      // revert and prompt
+      router.replace(currentPathRef.current)
+      pendingNavigation.current = () => router.push(target)
+      setShowLeavePrompt(true)
+    }
+
+    document.addEventListener('click', handleLinkClick, true)
+    window.addEventListener('popstate', handlePopState)
+    return () => {
+      document.removeEventListener('click', handleLinkClick, true)
+      window.removeEventListener('popstate', handlePopState)
+    }
+  }, [isDirty, pathname, router])
 
   return (
     <TooltipProvider delayDuration={150}>
-      <form onSubmit={handleSubmit(onSubmit)} className='space-y-8'>
+      <form
+        // eslint-disable-next-line react-hooks/refs
+        onSubmit={handleSubmit(onSubmitForm)}
+        className='space-y-8'
+        onReset={() => setShowLeavePrompt(false)}>
         {message && (
           <div
             className={cn(
@@ -205,15 +320,42 @@ export function BrandAssetsForm({
                     content='Buttons and key accents use this color.'
                   />
                 </div>
-                <div className='flex items-center gap-3'>
-                  <span
+                <div className='flex items-center gap-3 relative'>
+                  <button
+                    type='button'
                     className='size-10 rounded-md border shadow-inner'
                     style={{ backgroundColor: primaryColor }}
+                    onClick={() => {
+                      setShowPrimaryPicker((prev) => !prev)
+                      setShowSecondaryPicker(false)
+                    }}
+                    aria-label='Pick primary color'
                   />
+                  {showPrimaryPicker && (
+                    <div
+                      ref={pickerRef}
+                      className='absolute left-0 top-12 z-20 rounded-md border bg-card p-3 shadow-lg'>
+                      <HexColorPicker
+                        color={primaryColor}
+                        onChange={(value) => {
+                          setShowPrimaryPicker(true)
+                          setValue('primary_color', value, {
+                            shouldDirty: true,
+                            shouldTouch: true,
+                          })
+                        }}
+                      />
+                    </div>
+                  )}
                   <Input
                     id='primary_color'
                     placeholder='#5038EE'
-                    {...register('primary_color')}
+                    {...primaryColorField}
+                    ref={primaryColorRef}
+                    onChange={(e) => {
+                      primaryColorOnChange(e)
+                      setShowPrimaryPicker(false)
+                    }}
                   />
                 </div>
                 <FieldError errors={[errors.primary_color]} />
@@ -229,15 +371,42 @@ export function BrandAssetsForm({
                     content='Backgrounds for cards and subtle UI.'
                   />
                 </div>
-                <div className='flex items-center gap-3'>
-                  <span
+                <div className='flex items-center gap-3 relative'>
+                  <button
+                    type='button'
                     className='size-10 rounded-md border shadow-inner'
                     style={{ backgroundColor: secondaryColor }}
+                    onClick={() => {
+                      setShowSecondaryPicker((prev) => !prev)
+                      setShowPrimaryPicker(false)
+                    }}
+                    aria-label='Pick secondary color'
                   />
+                  {showSecondaryPicker && (
+                    <div
+                      ref={pickerRef}
+                      className='absolute left-0 top-12 z-20 rounded-md border bg-card p-3 shadow-lg'>
+                      <HexColorPicker
+                        color={secondaryColor}
+                        onChange={(value) => {
+                          setShowSecondaryPicker(true)
+                          setValue('secondary_color', value, {
+                            shouldDirty: true,
+                            shouldTouch: true,
+                          })
+                        }}
+                      />
+                    </div>
+                  )}
                   <Input
                     id='secondary_color'
                     placeholder='#F5F5F5'
-                    {...register('secondary_color')}
+                    {...secondaryColorField}
+                    ref={secondaryColorRef}
+                    onChange={(e) => {
+                      secondaryColorOnChange(e)
+                      setShowSecondaryPicker(false)
+                    }}
                   />
                 </div>
                 <FieldError errors={[errors.secondary_color]} />
@@ -396,6 +565,45 @@ export function BrandAssetsForm({
           </Button>
         </div>
       </form>
+
+      <Dialog open={showLeavePrompt} onOpenChange={setShowLeavePrompt}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Unsaved changes</DialogTitle>
+            <DialogDescription>
+              You have unsaved edits. Save before leaving?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className='flex justify-end gap-2'>
+            <Button
+              variant='outline'
+              onClick={() => {
+                setShowLeavePrompt(false)
+                if (pendingNavigation.current) {
+                  skipBlockRef.current = true
+                  pendingNavigation.current()
+                  pendingNavigation.current = undefined
+                }
+              }}>
+              Never mind
+            </Button>
+            <Button
+              onClick={() => {
+                handleSubmit(onSubmitForm)()
+              }}>
+              Save changes
+            </Button>
+            <Button
+              variant='ghost'
+              onClick={() => {
+                setShowLeavePrompt(false)
+                pendingNavigation.current = undefined
+              }}>
+              Stay here
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </TooltipProvider>
   )
 }

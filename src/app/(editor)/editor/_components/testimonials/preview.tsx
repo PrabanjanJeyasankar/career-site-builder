@@ -3,8 +3,8 @@
 import type { DeviceType } from '@/components/ui/device-switcher'
 import type { Testimonial } from '@/types/database'
 import Image from 'next/image'
-import { SectionHeading } from './section-heading'
-import { TestimonialLayout } from './testimonial-layout'
+import { SectionHeading } from '../section-heading'
+import { TestimonialLayout } from './layout'
 
 type TestimonialsPreviewProps = {
   data: Testimonial[]
@@ -56,7 +56,7 @@ export function TestimonialsPreview({
 
   return (
     <section className={`w-full bg-background ${sizes.section}`}>
-      <div className='mx-auto max-w-5xl px-4'>
+      <div className='mx-auto max-w-6xl px-4'>
         <div className='mb-16 flex items-baseline justify-between gap-4'>
           <SectionHeading
             eyebrow='Testimonials'

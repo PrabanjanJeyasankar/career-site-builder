@@ -10,10 +10,11 @@ import {
 import type { Perk } from '@/types/database'
 import { Plus } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
-import { InlineEmojiPicker } from './inline-emoji-picker'
-import { SectionHeading } from './section-heading'
-import { ValidatedPromptDialog } from './validated-prompt-dialog'
-import { ValuePerkEditorItem } from './value-perk-editor-item'
+
+import { InlineEmojiPicker } from '../inline-emoji-picker'
+import { SectionHeading } from '../section-heading'
+import { ValidatedPromptDialog } from '../validated-prompt-dialog'
+import { ValuePerkEditorItem } from '../value-perk-editor-item'
 
 type EditorProps = {
   initial: Perk[]

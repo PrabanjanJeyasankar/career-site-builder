@@ -3,7 +3,7 @@
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import type { CompanyUser } from '@/types/database'
 
-export async function getCurrentUserCompanyId(): Promise<string> {
+export async function getCurrentUserCompanyId(): Promise<string | null> {
   const supabase = await createSupabaseServerClient()
 
   const {
@@ -18,7 +18,7 @@ export async function getCurrentUserCompanyId(): Promise<string> {
     .eq('user_id', user.id)
     .single()
 
-  if (!data) throw new Error('User is not associated with any company')
+  if (!data) return null
 
   return data.company_id
 }
@@ -57,6 +57,8 @@ export async function hasRole(
 export async function getCurrentCompanyName(): Promise<string> {
   const supabase = await createSupabaseServerClient()
   const companyId = await getCurrentUserCompanyId()
+
+  if (!companyId) throw new Error('User is not associated with any company')
 
   const { data } = await supabase
     .from('companies')
