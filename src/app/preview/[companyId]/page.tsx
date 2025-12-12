@@ -15,6 +15,7 @@ import {
 import type { LifeSection } from '@/types/database'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import type { Viewport } from 'next'
 
 type PreviewPageProps = {
   params: Promise<{
@@ -43,14 +44,44 @@ export async function generateMetadata({
       : undefined
   const faviconUrl = rawFavicon?.trim() || undefined
 
+  const title = companyName ? `Careers at ${companyName}` : 'Careers'
+  const description =
+    profileResult.status === 'fulfilled' && profileResult.value?.description
+      ? profileResult.value.description
+      : companyName
+      ? `Explore open roles and life at ${companyName}.`
+      : 'Explore open roles and company culture.'
+  const socialImage =
+    profileResult.status === 'fulfilled'
+      ? profileResult.value?.social_preview_url ?? undefined
+      : undefined
+
   return {
-    title: companyName ? `Careers at ${companyName}` : 'Careers',
+    title,
+    description,
     icons: faviconUrl
       ? {
           icon: faviconUrl,
         }
       : undefined,
+    openGraph: {
+      title,
+      description,
+      type: 'website',
+      ...(socialImage ? { images: [socialImage] } : {}),
+    },
+    twitter: {
+      card: socialImage ? 'summary_large_image' : 'summary',
+      title,
+      description,
+      ...(socialImage ? { images: [socialImage] } : {}),
+    },
   }
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
 }
 
 // Preview must remain dynamic to reflect company-specific metadata/assets.
@@ -143,15 +174,64 @@ export default async function PreviewPage({ params }: PreviewPageProps) {
   }
 
   return (
-    <PreviewPageClient
-      heroData={heroData}
-      lifeData={life}
-      testimonialsData={testimonials}
-      valueItemsData={valueItems}
-      locationsData={locations}
-      perksData={perks}
-      jobsData={jobs}
-      sectionOrder={sectionOrder}
-    />
+    <>
+      {/* Structured data for better job + org SEO */}
+      <script
+        type='application/ld+json'
+        // We deliberately keep this JSON minimal and stable for crawlers.
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'Organization',
+            name: companyName,
+            url: typeof window === 'undefined' ? undefined : undefined,
+            logo: profile?.logo_url ?? undefined,
+          }),
+        }}
+      />
+      {jobs.length > 0 && (
+        <script
+          type='application/ld+json'
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(
+              jobs.map((job) => ({
+                '@context': 'https://schema.org',
+                '@type': 'JobPosting',
+                title: job.title,
+                description: job.description,
+                datePosted: job.posted_at,
+                employmentType: job.employment_type,
+                hiringOrganization: {
+                  '@type': 'Organization',
+                  name: companyName,
+                  logo: profile?.logo_url ?? undefined,
+                },
+                jobLocationType:
+                  job.work_type === 'remote' ? 'TELECOMMUTE' : undefined,
+                applicantLocationRequirements:
+                  job.work_type === 'remote'
+                    ? [
+                        {
+                          '@type': 'Country',
+                          name: 'Worldwide',
+                        },
+                      ]
+                    : undefined,
+              }))
+            ),
+          }}
+        />
+      )}
+      <PreviewPageClient
+        heroData={heroData}
+        lifeData={life}
+        testimonialsData={testimonials}
+        valueItemsData={valueItems}
+        locationsData={locations}
+        perksData={perks}
+        jobsData={jobs}
+        sectionOrder={sectionOrder}
+      />
+    </>
   )
 }

@@ -220,7 +220,7 @@ export function JobCard({
               href={job.apply_url}
               target='_blank'
               rel='noopener noreferrer'
-              className='inline-flex items-center justify-center gap-2 self-end rounded-full bg-primary px-4 py-2 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90'>
+              className='inline-flex items-center justify-center gap-2 self-end rounded-full bg-primary px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-primary/90'>
               Apply Now
               <ExternalLink className='h-4 w-4' />
             </a>

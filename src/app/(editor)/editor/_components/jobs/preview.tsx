@@ -181,7 +181,7 @@ export function JobsPreview({ data, device }: JobsPreviewProps) {
                       href={job.apply_url}
                       target='_blank'
                       rel='noopener noreferrer'
-                      className='inline-flex items-center justify-center gap-2 self-end rounded-full bg-primary px-4 py-2 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90'>
+                      className='inline-flex items-center justify-center gap-2 self-end rounded-full bg-primary px-4 py-2 text-xs font-medium  transition-colors hover:bg-primary/90 text-white!'>
                       Apply now
                       <ExternalLink className='h-3.5 w-3.5' />
                     </a>
