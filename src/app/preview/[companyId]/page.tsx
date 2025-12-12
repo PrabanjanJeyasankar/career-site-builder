@@ -13,9 +13,8 @@ import {
   getValueItemsByCompanyId,
 } from '@/lib/db/fetchSectionData'
 import type { LifeSection } from '@/types/database'
-import type { Metadata } from 'next'
-import { notFound } from 'next/navigation'
-import type { Viewport } from 'next'
+import type { Metadata, Viewport } from 'next'
+import { redirect } from 'next/navigation'
 
 type PreviewPageProps = {
   params: Promise<{
@@ -84,7 +83,6 @@ export const viewport: Viewport = {
   initialScale: 1,
 }
 
-// Preview must remain dynamic to reflect company-specific metadata/assets.
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
@@ -92,7 +90,7 @@ export default async function PreviewPage({ params }: PreviewPageProps) {
   const { companyId } = await params
 
   if (!companyId) {
-    notFound()
+    redirect('/preview')
   }
 
   const [
@@ -123,8 +121,7 @@ export default async function PreviewPage({ params }: PreviewPageProps) {
       : null
 
   if (!companyName) {
-    // If the company itself is missing, avoid leaking information and 404.
-    notFound()
+    redirect('/preview')
   }
 
   const profile =
@@ -175,10 +172,8 @@ export default async function PreviewPage({ params }: PreviewPageProps) {
 
   return (
     <>
-      {/* Structured data for better job + org SEO */}
       <script
         type='application/ld+json'
-        // We deliberately keep this JSON minimal and stable for crawlers.
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             '@context': 'https://schema.org',
