@@ -52,6 +52,13 @@ export function PreviewPageClient({
       ? 'w-[768px]'
       : 'w-[390px]'
 
+  const shellPadding =
+    device === 'desktop'
+      ? 'p-0'
+      : device === 'tablet'
+      ? 'px-6 py-8'
+      : 'px-4 py-6'
+
   const themeStyle: CSSProperties = {
     ['--primary' as keyof CSSProperties]: heroData.primaryColor,
     ['--secondary' as keyof CSSProperties]: heroData.secondaryColor,
@@ -65,7 +72,8 @@ export function PreviewPageClient({
         <DeviceSwitcher value={device} onChange={setDevice} />
       </div>
 
-      <div className='flex-1 flex items-center justify-center rounded-none '>
+      <div
+        className={`flex-1 flex items-center justify-center rounded-none ${shellPadding}`}>
         <div className={`${frame} overflow-hidden shadow-2xl rounded-none `}>
           <HeroSectionPreview data={heroData} device={device} />
           <PreviewSectionOrder

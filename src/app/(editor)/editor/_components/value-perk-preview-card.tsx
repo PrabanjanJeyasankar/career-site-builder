@@ -89,7 +89,7 @@ export function ValuePerkPreviewCard({
           className={cn(
             descriptionClassName,
             descriptionWidthClass,
-            'w-full text-balance leading-relaxed text-muted-foreground'
+            'w-full text-balance leading-relaxed text-muted-foreground text-center md:text-left'
           )}>
           {description || descriptionPlaceholder}
         </p>

@@ -425,7 +425,8 @@ export function LocationsEditor({ initial }: EditorProps) {
         onUpload={handleImageUpload}
         existingUrl={
           imageDialogLocationId
-            ? locations.find((l) => l.id === imageDialogLocationId)?.image_url
+            ? locations.find((l) => l.id === imageDialogLocationId)?.image_url ??
+              undefined
             : undefined
         }
         title='Upload location image'

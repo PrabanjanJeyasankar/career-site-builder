@@ -62,6 +62,7 @@ export function TestimonialsPreview({
             eyebrow='Testimonials'
             title='What our team says'
             description='A few words from the people behind the work.'
+            className='text-center md:text-left'
           />
         </div>
 
@@ -103,7 +104,7 @@ export function TestimonialsPreview({
 
             const quoteNode = (
               <p
-                className={`${sizes.quote} ${sizes.quoteMaxWidth} text-balance leading-relaxed text-muted-foreground italic`}>
+                className={`${sizes.quote} ${sizes.quoteMaxWidth} text-balance leading-relaxed text-muted-foreground italic text-center md:text-left`}>
                 {testimonial.quote}
               </p>
             )

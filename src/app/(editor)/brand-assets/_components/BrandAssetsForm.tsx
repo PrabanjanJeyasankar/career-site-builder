@@ -106,19 +106,17 @@ export function BrandAssetsForm({
         }}
         className='space-y-8'>
         <FormStatusBanner status={status} message={message} />
-
+        <AIBrandGenerator
+          url={aiBrandGenerator.url}
+          error={aiBrandGenerator.error}
+          isPending={aiBrandGenerator.isPending}
+          onUrlChange={aiBrandGenerator.updateUrl}
+          onGenerate={aiBrandGenerator.generate}
+        />
         <BrandIdentitySection
           register={register}
           control={control}
           errors={errors}>
-          <AIBrandGenerator
-            url={aiBrandGenerator.url}
-            error={aiBrandGenerator.error}
-            isPending={aiBrandGenerator.isPending}
-            onUrlChange={aiBrandGenerator.updateUrl}
-            onGenerate={aiBrandGenerator.generate}
-          />
-
           <div className='grid gap-6 md:grid-cols-2'>
             <ColorPickerField
               id='primary_color'

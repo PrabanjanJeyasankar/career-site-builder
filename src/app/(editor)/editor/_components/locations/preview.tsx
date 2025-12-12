@@ -21,7 +21,7 @@ export function LocationsPreview({ data, device }: LocationsPreviewProps) {
       address: 'text-xs',
       image: 'h-32',
       section: 'py-16',
-      grid: 'grid-cols-1 gap-8',
+      grid: 'grid-cols-1 gap-6 justify-items-stretch',
       card: 'p-5',
     },
     tablet: {
@@ -32,7 +32,7 @@ export function LocationsPreview({ data, device }: LocationsPreviewProps) {
       address: 'text-sm',
       image: 'h-40',
       section: 'py-16',
-      grid: 'grid-cols-2 gap-8',
+      grid: 'grid-cols-2 gap-8 justify-items-start',
       card: 'p-5',
     },
     desktop: {
@@ -43,7 +43,7 @@ export function LocationsPreview({ data, device }: LocationsPreviewProps) {
       address: 'text-sm',
       image: 'h-48',
       section: 'py-16',
-      grid: 'grid-cols-3 gap-8',
+      grid: 'grid-cols-3 gap-8 justify-items-start',
       card: 'p-5',
     },
   }[device]
@@ -51,15 +51,17 @@ export function LocationsPreview({ data, device }: LocationsPreviewProps) {
   return (
     <section className={`w-full bg-background ${sizes.section}`}>
       <div className='mx-auto max-w-6xl px-4'>
-        <div className='mb-16 flex items-baseline justify-between gap-4'>
+        <div className='mb-12 md:mb-16 flex items-baseline justify-between gap-4'>
           <SectionHeading
             eyebrow='Locations'
             title='Where we work from'
             description='Show the hubs and spaces where your teams collaborate.'
+            className='text-center md:text-left'
           />
         </div>
 
-        <div className={`grid ${sizes.grid}`}>
+        <div
+          className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 justify-items-stretch sm:justify-items-start`}>
           {data.map((location) => (
             <div
               key={location.id}

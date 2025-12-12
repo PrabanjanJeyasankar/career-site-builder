@@ -45,18 +45,24 @@ export function PerksPreview({
   const tileColor = secondaryColor || primaryColor
   const iconColor = primaryColor || secondaryColor
 
+  const gridClass =
+    'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 justify-items-stretch sm:justify-items-start'
+
+  const cardWidthClass = 'w-full'
+
   return (
     <section className={`w-full bg-background ${sizes.section}`}>
       <div className='mx-auto max-w-6xl px-4'>
-        <div className='mb-16 flex items-baseline justify-between gap-4'>
+        <div className='mb-12 md:mb-16 flex items-baseline justify-between gap-4'>
           <SectionHeading
             eyebrow='Benefits & perks'
             title='What makes working here special'
             description='Highlight the advantages of working with your team.'
+            className='text-center md:text-left'
           />
         </div>
 
-        <div className='grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3'>
+        <div className={`grid ${gridClass}`}>
           {data.map((perk) => (
             <ValuePerkPreviewCard
               key={perk.id}
@@ -66,7 +72,7 @@ export function PerksPreview({
               variant='perk'
               titleClassName={sizes.label}
               descriptionClassName={sizes.description}
-              className='pt-4'
+              className={`${cardWidthClass} max-w-full pt-2 md:max-w-sm md:pt-4`}
               tileBgColor={tileColor}
               tileBgOpacity={0.1}
               iconBgColor={iconColor}
