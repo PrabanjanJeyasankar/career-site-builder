@@ -42,29 +42,18 @@ export function HeroSectionPreview({ data, device }: HeroSectionPreviewProps) {
     <section className='relative overflow-hidden bg-gray-900 text-white'>
       <div className='absolute inset-0 pointer-events-none'>
         {data.heroBackgroundUrl && (
-          <>
-            <Image
-              src={data.heroBackgroundUrl}
-              alt=''
-              fill
-              unoptimized
-              priority
-              sizes='(min-width: 1024px) 1200px, 100vw'
-              className='object-cover'
-            />
-            <Image
-              src={data.heroBackgroundUrl}
-              alt=''
-              fill
-              unoptimized
-              priority
-              sizes='(min-width: 1024px) 1200px, 100vw'
-              className='scale-110 object-cover blur-3xl opacity-80'
-            />
-            <div className='absolute inset-0 bg-gradient-to-b from-black/40 via-black/10 to-black/60' />
-          </>
+          <Image
+            src={data.heroBackgroundUrl}
+            alt=''
+            fill
+            unoptimized
+            priority
+            sizes='(min-width: 1024px) 1200px, 100vw'
+            className='object-cover'
+          />
         )}
       </div>
+      <div className='absolute inset-0 pointer-events-none backdrop-blur-2xl bg-black/30' />
 
       <div
         className={`relative flex flex-col items-center justify-center px-4 py-10 ${sizes.height}`}>

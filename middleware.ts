@@ -35,8 +35,13 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // If there's an error or no user, and not already on login or root, redirect to login
-  if ((error || !user) && !pathname.startsWith('/login') && pathname !== '/') {
+  // If there's an error or no user, and not already on login, root, or preview, redirect to login
+  if (
+    (error || !user) &&
+    !pathname.startsWith('/login') &&
+    pathname !== '/' &&
+    !pathname.startsWith('/preview')
+  ) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     url.searchParams.set('redirectedFrom', pathname)

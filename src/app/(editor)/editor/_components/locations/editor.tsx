@@ -16,6 +16,7 @@ import {
   deleteLocationInline,
   saveLocationInline,
 } from '@/lib/actions/locationsInline'
+import { ImageUploadDialog } from '@/components/common/ImageUploadDialog'
 import type { Location } from '@/types/database'
 import { MapPin, Plus, Replace } from 'lucide-react'
 import Image from 'next/image'
@@ -39,10 +40,15 @@ export function LocationsEditor({ initial }: EditorProps) {
   const countryRef = useRef<HTMLInputElement | null>(null)
   const addressRef = useRef<HTMLTextAreaElement | null>(null)
 
-  const [dialogOpen, setDialogOpen] = useState(false)
-  const [dialogUrl, setDialogUrl] = useState('')
-  const [dialogType, setDialogType] = useState<'image' | 'map' | null>(null)
-  const [dialogLocationId, setDialogLocationId] = useState<string | null>(null)
+  const [mapDialogOpen, setMapDialogOpen] = useState(false)
+  const [mapDialogUrl, setMapDialogUrl] = useState('')
+  const [mapDialogLocationId, setMapDialogLocationId] = useState<string | null>(
+    null
+  )
+  const [imageDialogOpen, setImageDialogOpen] = useState(false)
+  const [imageDialogLocationId, setImageDialogLocationId] = useState<
+    string | null
+  >(null)
 
   async function save(id: string, patch: Partial<Location>) {
     // Find the current location to get required fields
@@ -112,31 +118,39 @@ export function LocationsEditor({ initial }: EditorProps) {
     }
   }
 
-  async function saveUrl() {
-    if (!dialogLocationId || !dialogType) return
+  async function saveMapUrl() {
+    if (!mapDialogLocationId) return
 
-    const field = dialogType === 'image' ? 'image_url' : 'map_url'
     const nextLocations = locations.map((l) =>
-      l.id === dialogLocationId ? { ...l, [field]: dialogUrl } : l
+      l.id === mapDialogLocationId ? { ...l, map_url: mapDialogUrl } : l
     )
     setLocations(nextLocations)
 
-    const patch =
-      dialogType === 'image' ? { image_url: dialogUrl } : { map_url: dialogUrl }
-
-    await save(dialogLocationId, patch)
-    setDialogOpen(false)
+    await save(mapDialogLocationId, { map_url: mapDialogUrl })
+    setMapDialogOpen(false)
   }
 
-  function openUrlDialog(
-    locationId: string,
-    type: 'image' | 'map',
-    currentUrl: string
-  ) {
-    setDialogLocationId(locationId)
-    setDialogType(type)
-    setDialogUrl(currentUrl || '')
-    setDialogOpen(true)
+  function openMapDialog(locationId: string, currentUrl: string) {
+    setMapDialogLocationId(locationId)
+    setMapDialogUrl(currentUrl || '')
+    setMapDialogOpen(true)
+  }
+
+  function openImageDialog(locationId: string) {
+    setImageDialogLocationId(locationId)
+    setImageDialogOpen(true)
+  }
+
+  async function handleImageUpload(url: string) {
+    if (!imageDialogLocationId) return
+
+    const nextLocations = locations.map((l) =>
+      l.id === imageDialogLocationId ? { ...l, image_url: url } : l
+    )
+    setLocations(nextLocations)
+    await save(imageDialogLocationId, { image_url: url })
+    setImageDialogOpen(false)
+    setImageDialogLocationId(null)
   }
 
   useEffect(() => {
@@ -213,13 +227,7 @@ export function LocationsEditor({ initial }: EditorProps) {
                   <Button
                     size='sm'
                     variant='secondary'
-                    onClick={() =>
-                      openUrlDialog(
-                        location.id,
-                        'image',
-                        location.image_url || ''
-                      )
-                    }
+                    onClick={() => openImageDialog(location.id)}
                     className='h-8 px-2 text-xs flex items-center gap-1'>
                     <Replace className='h-3 w-3 text' />
                     Image
@@ -350,7 +358,7 @@ export function LocationsEditor({ initial }: EditorProps) {
                     size='sm'
                     variant='outline'
                     onClick={() =>
-                      openUrlDialog(location.id, 'map', location.map_url || '')
+                      openMapDialog(location.id, location.map_url || '')
                     }
                     className='inline-flex items-center justify-center gap-2 rounded-full px-3 text-[0.7rem]'>
                     <MapPin className='h-3 w-3' />
@@ -375,38 +383,54 @@ export function LocationsEditor({ initial }: EditorProps) {
         </div>
       </div>
 
-      <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      <AlertDialog
+        open={mapDialogOpen}
+        onOpenChange={(open) => {
+          if (!open) {
+            setMapDialogLocationId(null)
+            setMapDialogUrl('')
+          }
+          setMapDialogOpen(open)
+        }}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {dialogType === 'image'
-                ? 'Replace Location Image'
-                : 'Add Map Link'}
+              Add Map Link
             </AlertDialogTitle>
             <AlertDialogDescription>
-              {dialogType === 'image'
-                ? 'Paste a public image URL for this location.'
-                : 'Paste a Google Maps or other map link.'}
+              Paste a Google Maps or other map link.
             </AlertDialogDescription>
           </AlertDialogHeader>
 
           <input
-            value={dialogUrl}
-            onChange={(e) => setDialogUrl(e.target.value)}
+            value={mapDialogUrl}
+            onChange={(e) => setMapDialogUrl(e.target.value)}
             className='mt-4 w-full rounded border p-2 outline-none'
-            placeholder={
-              dialogType === 'image'
-                ? 'https://example.com/location.jpg'
-                : 'https://maps.google.com/...'
-            }
+            placeholder='https://maps.google.com/...'
           />
 
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={saveUrl}>Save</AlertDialogAction>
+            <AlertDialogAction onClick={saveMapUrl}>Save</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <ImageUploadDialog
+        open={imageDialogOpen}
+        onOpenChange={(open) => {
+          if (!open) setImageDialogLocationId(null)
+          setImageDialogOpen(open)
+        }}
+        onUpload={handleImageUpload}
+        existingUrl={
+          imageDialogLocationId
+            ? locations.find((l) => l.id === imageDialogLocationId)?.image_url
+            : undefined
+        }
+        title='Upload location image'
+        description='Choose a photo from your computer or paste a URL.'
+      />
     </section>
   )
 }
