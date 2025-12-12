@@ -42,7 +42,7 @@ export function ValueItemsPreview({
     },
   }[device]
 
-  const tileColor = secondaryColor || primaryColor
+  const tileColor = primaryColor || secondaryColor
   const iconColor = primaryColor || secondaryColor
 
   return (

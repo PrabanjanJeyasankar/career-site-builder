@@ -28,6 +28,7 @@ export function ApplyLinkDialog({
       value={value}
       onValueChange={onChange}
       onConfirm={onConfirm}
+      validateUrl={true}
     />
   )
 }

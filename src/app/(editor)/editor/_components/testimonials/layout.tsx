@@ -30,13 +30,13 @@ export function TestimonialLayout({
         <div className='flex-shrink-0'>
           <div
             className={cn(
-              'relative inline-flex min-w-[10.5rem] items-center justify-center rounded-[1.75rem] bg-chart-1/10 px-8 py-9',
+              'relative inline-flex min-w-[10.5rem] items-center justify-center rounded-[1.75rem] bg-primary/10 px-8 py-9 text-primary',
               avatarWrapperClass
             )}>
-            <span className='pointer-events-none absolute -top-8 left-4 text-4xl font-semibold leading-none text-chart-1'>
+            <span className='pointer-events-none absolute -top-8 left-4 text-4xl font-semibold leading-none text-primary/80'>
               &ldquo;
             </span>
-            <span className='pointer-events-none absolute -bottom-10 right-6 text-4xl font-semibold leading-none text-chart-1'>
+            <span className='pointer-events-none absolute -bottom-10 right-6 text-4xl font-semibold leading-none text-primary/80'>
               &rdquo;
             </span>
 

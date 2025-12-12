@@ -45,7 +45,7 @@ Below is a quick reference of the keys used across the app (see `.env.example` f
 
 - Supabase auth: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - Cloudflare R2 uploads: `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_R2_ACCESS_KEY_ID`, `CLOUDFLARE_R2_SECRET_ACCESS_KEY`, `CLOUDFLARE_R2_BUCKET_NAME`, `CLOUDFLARE_R2_PUBLIC_DOMAIN`
-- AI/profile enrichment (optional): `APIFY_TOKEN`, `IMAGGA_API_KEY`, `IMAGGA_API_SECRET`, `GEMINI_API_KEY`
+- AI/profile enrichment (optional): `APIFY_TOKEN`, `IMAGGA_API_KEY`, `IMAGGA_API_SECRET`, `LLM` (`openai` | `ollama`), `OPENAI_API_KEY`, `OPENAI_MODEL`, `OLLAMA_BASE_URL`, `OLLAMA_MODEL`
 
 ---
 

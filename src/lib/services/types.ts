@@ -73,6 +73,14 @@ export type ColorExtractorConfig = {
   apiSecret: string
 }
 
-export type AIRefinementConfig = {
+export type OpenAIRefinementConfig = {
   apiKey: string
+  model?: string
 }
+
+export type OllamaAIRefinementConfig = {
+  baseUrl?: string
+  model?: string
+}
+
+export type LLMProvider = 'openai' | 'ollama'

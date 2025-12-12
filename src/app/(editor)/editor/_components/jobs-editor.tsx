@@ -2,17 +2,31 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { UploadCloud, Plus } from 'lucide-react'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { Plus, Upload, UploadCloud } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
 import { useJobsImport } from '@/hooks/use-jobs-import'
-import { createJobInline, deleteJobInline, saveJobInline } from '@/lib/actions/jobsInline'
+import {
+  createJobInline,
+  deleteJobInline,
+  saveJobInline,
+} from '@/lib/actions/jobsInline'
 import type { Job } from '@/types/database'
-import { ApplyLinkDialog } from './jobs/apply-link-dialog'
-import { CreateJobDialog, type CreateJobFormState } from './jobs/create-job-dialog'
-import { JobCard } from './jobs/job-card'
 import { JobFilters } from './job-filters'
+import { ApplyLinkDialog } from './jobs/apply-link-dialog'
+import {
+  CreateJobDialog,
+  type CreateJobFormState,
+} from './jobs/create-job-dialog'
+import { JobCard } from './jobs/job-card'
 import { SectionHeading } from './section-heading'
 
 type EditorProps = {
@@ -50,56 +64,88 @@ export function JobsEditor({ initial }: EditorProps) {
 
   const departmentOptions = useMemo(
     () =>
-      Array.from(new Set(jobs.map((j) => j.department).filter(Boolean))).map((value) => ({
-        value,
-        label: value,
-      })),
+      Array.from(new Set(jobs.map((j) => j.department).filter(Boolean))).map(
+        (value) => ({
+          value,
+          label: value,
+        })
+      ),
     [jobs]
   )
 
   const locationOptions = useMemo(
     () =>
-      Array.from(new Set(jobs.map((j) => j.location).filter(Boolean))).map((value) => ({
-        value,
-        label: value,
-      })),
+      Array.from(new Set(jobs.map((j) => j.location).filter(Boolean))).map(
+        (value) => ({
+          value,
+          label: value,
+        })
+      ),
     [jobs]
   )
 
   const workTypeOptions = useMemo(
     () =>
-      Array.from(new Set(jobs.map((j) => j.work_type).filter(Boolean))).map((value) => ({
-        value,
-        label: value.replace('-', ' '),
-      })),
+      Array.from(new Set(jobs.map((j) => j.work_type).filter(Boolean))).map(
+        (value) => ({
+          value,
+          label: value.replace('-', ' '),
+        })
+      ),
     [jobs]
   )
 
   const employmentOptions = useMemo(
     () =>
-      Array.from(new Set(jobs.map((j) => j.employment_type).filter(Boolean))).map(
-        (value) => ({ value, label: value.replace('-', ' ') })
-      ),
+      Array.from(
+        new Set(jobs.map((j) => j.employment_type).filter(Boolean))
+      ).map((value) => ({ value, label: value.replace('-', ' ') })),
     [jobs]
   )
 
   const filteredJobs = useMemo(() => {
     const q = search.trim().toLowerCase()
     return jobs.filter((job) => {
-      if (departmentFilter !== 'all' && job.department.toLowerCase() !== departmentFilter.toLowerCase())
+      if (
+        departmentFilter !== 'all' &&
+        job.department.toLowerCase() !== departmentFilter.toLowerCase()
+      )
         return false
-      if (locationFilter !== 'all' && job.location.toLowerCase() !== locationFilter.toLowerCase()) return false
-      if (workTypeFilter !== 'all' && job.work_type.toLowerCase() !== workTypeFilter.toLowerCase()) return false
+      if (
+        locationFilter !== 'all' &&
+        job.location.toLowerCase() !== locationFilter.toLowerCase()
+      )
+        return false
+      if (
+        workTypeFilter !== 'all' &&
+        job.work_type.toLowerCase() !== workTypeFilter.toLowerCase()
+      )
+        return false
       if (
         employmentFilter !== 'all' &&
         job.employment_type.toLowerCase() !== employmentFilter.toLowerCase()
       )
         return false
       if (!q) return true
-      const haystack = (job.title + ' ' + job.department + ' ' + job.location + ' ' + job.description).toLowerCase()
+      const haystack = (
+        job.title +
+        ' ' +
+        job.department +
+        ' ' +
+        job.location +
+        ' ' +
+        job.description
+      ).toLowerCase()
       return haystack.includes(q)
     })
-  }, [jobs, search, departmentFilter, locationFilter, workTypeFilter, employmentFilter])
+  }, [
+    jobs,
+    search,
+    departmentFilter,
+    locationFilter,
+    workTypeFilter,
+    employmentFilter,
+  ])
 
   function updateJobLocal(id: string, patch: Partial<Job>) {
     setJobs((prev) =>
@@ -149,6 +195,14 @@ export function JobsEditor({ initial }: EditorProps) {
     if (!applyJobId) return
     const trimmedUrl = applyUrl.trim()
     if (!trimmedUrl) return
+
+    try {
+      const urlObj = new URL(trimmedUrl)
+      if (urlObj.protocol !== 'http:' && urlObj.protocol !== 'https:') return
+    } catch {
+      return
+    }
+
     updateJobLocal(applyJobId, { apply_url: trimmedUrl })
     await saveJob(applyJobId, { apply_url: trimmedUrl })
     setApplyDialogOpen(false)
@@ -195,6 +249,7 @@ export function JobsEditor({ initial }: EditorProps) {
               variant='outline'
               size='sm'
               className='shrink-0 items-center gap-2'>
+              <Upload className='h-4 w-4' />
               Upload CSV
             </Button>
             <Button
@@ -234,7 +289,9 @@ export function JobsEditor({ initial }: EditorProps) {
               onUpdateLocal={updateJobLocal}
               onSaveField={saveJob}
               onDelete={() => handleDeleteJob(job.id)}
-              onApplyClick={() => openApplyUrlDialog(job.id, job.apply_url || '')}
+              onApplyClick={() =>
+                openApplyUrlDialog(job.id, job.apply_url || '')
+              }
             />
           ))}
         </div>
@@ -245,6 +302,7 @@ export function JobsEditor({ initial }: EditorProps) {
             size='sm'
             className='flex-1'
             onClick={() => setImportDialogOpen(true)}>
+            <Upload className='h-4 w-4' />
             Upload CSV
           </Button>
           <Button
@@ -289,7 +347,9 @@ export function JobsEditor({ initial }: EditorProps) {
                 </div>
                 <div>
                   <p className='text-lg font-semibold'>Drag and drop or</p>
-                  <p className='text-sm text-muted-foreground'>CSV file up to 5 MB</p>
+                  <p className='text-sm text-muted-foreground'>
+                    CSV file up to 5 MB
+                  </p>
                 </div>
                 <Button
                   type='button'
@@ -297,7 +357,9 @@ export function JobsEditor({ initial }: EditorProps) {
                   onClick={() => csvInputRef.current?.click()}>
                   Upload CSV
                 </Button>
-                <p className='text-xs text-muted-foreground'>or drag and drop your file here</p>
+                <p className='text-xs text-muted-foreground'>
+                  or drag and drop your file here
+                </p>
               </div>
               <input
                 ref={csvInputRef}
@@ -312,17 +374,24 @@ export function JobsEditor({ initial }: EditorProps) {
               title,department,location,work_type,employment_type,description,apply_url
             </div>
             <p className='text-xs text-muted-foreground'>
-              Examples: work_type = remote | hybrid | onsite. employment_type = full-time | part-time | contract |
-              internship.
+              Examples: work_type = remote | hybrid | onsite. employment_type =
+              full-time | part-time | contract | internship.
             </p>
             {parsedRows.length > 0 && (
-              <p className='text-sm text-foreground'>{parsedRows.length} rows ready to import.</p>
+              <p className='text-sm text-foreground'>
+                {parsedRows.length} rows ready to import.
+              </p>
             )}
-            {importError && <p className='text-sm text-destructive'>{importError}</p>}
+            {importError && (
+              <p className='text-sm text-destructive'>{importError}</p>
+            )}
           </div>
 
           <DialogFooter>
-            <Button variant='outline' onClick={() => setImportDialogOpen(false)} disabled={importing}>
+            <Button
+              variant='outline'
+              onClick={() => setImportDialogOpen(false)}
+              disabled={importing}>
               Cancel
             </Button>
             <Button

@@ -128,7 +128,11 @@ function PreviewSectionOrder({
       />
     ),
     testimonials: (
-      <TestimonialsPreview data={testimonialsData} device={device} />
+      <TestimonialsPreview
+        data={testimonialsData}
+        device={device}
+        primaryColor={heroData.primaryColor}
+      />
     ),
     locations: <LocationsPreview data={locationsData} device={device} />,
     perks: (

@@ -1,7 +1,7 @@
 import { InlineDeleteButton } from '@/app/(editor)/editor/_components/inline-delete-button'
 import { cn } from '@/lib/utils'
 import type { Job } from '@/types/database'
-import { ExternalLink } from 'lucide-react'
+import { ArrowBigUpDash, ExternalLink, Plus } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 
 type JobCardProps = {
@@ -220,7 +220,7 @@ export function JobCard({
               href={job.apply_url}
               target='_blank'
               rel='noopener noreferrer'
-              className='inline-flex items-center justify-center gap-2 rounded-full bg-foreground px-4 py-2 text-xs font-medium text-background transition-colors hover:bg-foreground/90'>
+              className='inline-flex items-center justify-center gap-2 self-end rounded-full bg-primary px-4 py-2 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90'>
               Apply Now
               <ExternalLink className='h-4 w-4' />
             </a>
@@ -234,10 +234,20 @@ export function JobCard({
             type='button'
             onClick={onApplyClick}
             className={cn(
-              'h-8 rounded-full border border-border px-3 text-[0.7rem] transition-colors',
+              'inline-flex h-8 w-fit items-center justify-center gap-1.5 self-end rounded-full border border-border px-3 text-[0.7rem] transition-colors',
               'hover:border-primary hover:text-primary'
             )}>
-            {job.apply_url ? 'Update Link' : 'Add Apply Link'}
+            {job.apply_url ? (
+              <>
+                <ArrowBigUpDash className='h-3.5 w-3.5' />
+                <span>Update Link</span>
+              </>
+            ) : (
+              <>
+                <Plus className='h-3.5 w-3.5' />
+                <span>Add Apply Link</span>
+              </>
+            )}
           </button>
         </div>
       </div>

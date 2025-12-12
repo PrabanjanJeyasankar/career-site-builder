@@ -70,53 +70,60 @@ export function EditorPageClient({
     if (!hash) return
     const el = document.getElementById(hash)
     if (!el) return
-    window.scrollTo(0, el.offsetTop)
+    requestAnimationFrame(() => {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    })
   }, [])
 
-  const themeStyle: Record<string, string> = {}
-  themeStyle['--primary'] = heroData.primaryColor
-  themeStyle['--secondary'] = heroData.secondaryColor
+  const heroThemeStyle: Record<string, string> = {
+    '--primary': heroData.primaryColor,
+    '--secondary': heroData.secondaryColor,
+  }
 
   return (
-    <div className='relative' style={themeStyle}>
+    <div className='relative'>
+      {/* GLOBAL ACTION — uses globals.css primary */}
       <div className='absolute top-4 right-4 z-30'>
         <Button
           size='sm'
-          className='cursor-pointer flex items-center gap-2 bg-primary!'
+          className='flex items-center gap-2'
           onClick={() => window.open(previewUrl, '_blank')}>
           <CircleArrowOutUpRight className='h-4 w-4' />
           Preview
         </Button>
       </div>
 
-      <motion.div id='hero'>
-        <HeroSectionEditor initialData={heroData} />
-      </motion.div>
+      {/* THEMED CONTENT ONLY */}
+      <div style={heroThemeStyle}>
+        <motion.div id='hero'>
+          <HeroSectionEditor initialData={heroData} />
+        </motion.div>
 
-      <SectionOrderList
-        initialOrder={sectionOrder}
-        life={<LifeSectionEditor initial={lifeData} />}
-        values={
-          <ValueItemsEditor
-            initial={valueItemsData}
-            primaryColor={heroData.primaryColor}
-            secondaryColor={heroData.secondaryColor}
-          />
-        }
-        testimonials={<TestimonialsEditor initial={testimonialsData} />}
-        locations={<LocationsEditor initial={locationsData} />}
-        perks={
-          <PerksEditor
-            initial={perksData}
-            primaryColor={heroData.primaryColor}
-            secondaryColor={heroData.secondaryColor}
-          />
-        }
-      />
+        <SectionOrderList
+          initialOrder={sectionOrder}
+          life={<LifeSectionEditor initial={lifeData} />}
+          values={
+            <ValueItemsEditor
+              initial={valueItemsData}
+              primaryColor={heroData.primaryColor}
+              secondaryColor={heroData.secondaryColor}
+            />
+          }
+          testimonials={<TestimonialsEditor initial={testimonialsData} />}
+          locations={<LocationsEditor initial={locationsData} />}
+          perks={
+            <PerksEditor
+              initial={perksData}
+              primaryColor={heroData.primaryColor}
+              secondaryColor={heroData.secondaryColor}
+            />
+          }
+        />
 
-      <motion.div id='jobs'>
-        <JobsEditor initial={jobsData} />
-      </motion.div>
+        <motion.div id='jobs'>
+          <JobsEditor initial={jobsData} />
+        </motion.div>
+      </div>
     </div>
   )
 }
@@ -236,7 +243,7 @@ function DraggableSection({
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
-      className={`relative rounded-xl border transition-all ${
+      className={`relative rounded-none border transition-all ${
         isDraggingOver
           ? 'border-primary ring-2 ring-primary/30 shadow-lg shadow-primary/20'
           : 'border-transparent'

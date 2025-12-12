@@ -42,7 +42,7 @@ export function PerksPreview({
     },
   }[device]
 
-  const tileColor = secondaryColor || primaryColor
+  const tileColor = primaryColor || secondaryColor
   const iconColor = primaryColor || secondaryColor
 
   const gridClass =

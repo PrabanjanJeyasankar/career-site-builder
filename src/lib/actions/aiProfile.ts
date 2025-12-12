@@ -3,7 +3,11 @@
 
 import type { CompanyInfo, PipelineLog } from '@/lib/services/types'
 
-import { GeminiAIRefinementService } from '@/lib/services/aiRefinementService'
+import {
+  OllamaAIRefinementService,
+  OpenAIRefinementService,
+  normalizeLLMProvider,
+} from '@/lib/services/aiRefinementService'
 import { ImaggaColorExtractionService } from '@/lib/services/colorExtractionService'
 import { ApifyMetadataScraperService } from '@/lib/services/metadataScraperService'
 import { selectBestImage } from '@/lib/utils/metadataUtils'
@@ -53,6 +57,8 @@ export async function fetchCompanyProfileFromUrl(url: string): Promise<{
 
     const imaggaApiKey = process.env.IMAGGA_API_KEY
     const imaggaApiSecret = process.env.IMAGGA_API_SECRET
+    const requestedLLM = process.env.LLM ?? 'openai'
+    const llmProvider = normalizeLLMProvider(requestedLLM)
 
     let colors = { primary: '#5038EE', secondary: '#F5F5F5' }
 
@@ -73,13 +79,37 @@ export async function fetchCompanyProfileFromUrl(url: string): Promise<{
       })
     }
 
-    const geminiApiKey = process.env.GEMINI_API_KEY
+    console.log('aiProfile: LLM provider selected', {
+      requested: requestedLLM,
+      provider: llmProvider,
+    })
+    logs.push({
+      step: 'llm:provider',
+      info: `Using ${llmProvider} provider`,
+      meta: { requested: requestedLLM },
+    })
+
+    const openaiApiKey = process.env.OPENAI_API_KEY
+    const openaiModel = process.env.OPENAI_MODEL
+    const ollamaBaseUrl = process.env.OLLAMA_BASE_URL
+    const ollamaModel = process.env.OLLAMA_MODEL
 
     let companyInfo: CompanyInfo
 
-    if (geminiApiKey) {
-      const aiService = new GeminiAIRefinementService(
-        { apiKey: geminiApiKey },
+    if (llmProvider === 'ollama') {
+      const aiService = new OllamaAIRefinementService(
+        { baseUrl: ollamaBaseUrl, model: ollamaModel },
+        logs
+      )
+      companyInfo = await aiService.refine(
+        rawMetadata,
+        colors,
+        bestImageUrl,
+        url
+      )
+    } else if (openaiApiKey) {
+      const aiService = new OpenAIRefinementService(
+        { apiKey: openaiApiKey, model: openaiModel },
         logs
       )
       companyInfo = await aiService.refine(
@@ -89,10 +119,10 @@ export async function fetchCompanyProfileFromUrl(url: string): Promise<{
         url
       )
     } else {
-      console.warn('aiProfile: missing Gemini API key; using heuristic profile')
+      console.warn('aiProfile: missing OpenAI API key; using heuristic profile')
       logs.push({
-        step: 'gemini:skip',
-        info: 'Missing GEMINI_API_KEY; using heuristic',
+        step: 'openai:skip',
+        info: 'Missing OPENAI_API_KEY; using heuristic',
       })
       const { buildHeuristicProfile } = await import(
         '@/lib/utils/metadataUtils'

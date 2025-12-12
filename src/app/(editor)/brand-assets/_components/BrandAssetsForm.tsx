@@ -104,12 +104,13 @@ export function BrandAssetsForm({
           event.preventDefault()
           handleSubmit(submitForm)(event)
         }}
-        className='space-y-8'>
+        className='space-y-4'>
         <FormStatusBanner status={status} message={message} />
         <AIBrandGenerator
           url={aiBrandGenerator.url}
           error={aiBrandGenerator.error}
           isPending={aiBrandGenerator.isPending}
+          currentStep={aiBrandGenerator.currentStep}
           onUrlChange={aiBrandGenerator.updateUrl}
           onGenerate={aiBrandGenerator.generate}
         />

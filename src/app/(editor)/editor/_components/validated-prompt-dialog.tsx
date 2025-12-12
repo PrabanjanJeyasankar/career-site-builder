@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
+import DOMPurify from 'isomorphic-dompurify'
 import { useState, type ReactNode } from 'react'
 
 type ValidatedPromptDialogProps = {
@@ -29,6 +30,7 @@ type ValidatedPromptDialogProps = {
   cancelLabel?: string
   className?: string
   children?: ReactNode
+  validateUrl?: boolean
 }
 
 export function ValidatedPromptDialog({
@@ -45,8 +47,19 @@ export function ValidatedPromptDialog({
   cancelLabel = 'Cancel',
   className,
   children,
+  validateUrl = false,
 }: ValidatedPromptDialogProps) {
   const [error, setError] = useState<string | null>(null)
+
+  function isValidUrl(url: string): boolean {
+    if (!url.trim()) return false
+    try {
+      const urlObj = new URL(url.trim())
+      return urlObj.protocol === 'http:' || urlObj.protocol === 'https:'
+    } catch {
+      return false
+    }
+  }
 
   function handleOpenChange(isOpen: boolean) {
     if (!isOpen) {
@@ -56,15 +69,23 @@ export function ValidatedPromptDialog({
   }
 
   async function handleConfirm() {
-    const nextValue = value.trim()
+    const sanitized = DOMPurify.sanitize(value.trim())
+    const nextValue = sanitized
     if (!nextValue) {
       setError('Please add a value before saving.')
+      return
+    }
+
+    if (validateUrl && !isValidUrl(nextValue)) {
+      setError('Please enter a valid URL (must start with http:// or https://)')
       return
     }
 
     await onConfirm(nextValue)
     onOpenChange(false)
   }
+
+  const isFormValid = value.trim() && (!validateUrl || isValidUrl(value.trim()))
 
   return (
     <AlertDialog open={open} onOpenChange={handleOpenChange}>
@@ -87,7 +108,7 @@ export function ValidatedPromptDialog({
               value={value}
               onChange={(e) => {
                 if (error) setError(null)
-                onValueChange(e.target.value)
+                onValueChange(DOMPurify.sanitize(e.target.value))
               }}
               placeholder={placeholder}
               className={cn(
@@ -104,7 +125,7 @@ export function ValidatedPromptDialog({
 
         <AlertDialogFooter>
           <AlertDialogCancel>{cancelLabel}</AlertDialogCancel>
-          <AlertDialogAction onClick={handleConfirm}>
+          <AlertDialogAction onClick={handleConfirm} disabled={!isFormValid}>
             {confirmLabel}
           </AlertDialogAction>
         </AlertDialogFooter>

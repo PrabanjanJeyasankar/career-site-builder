@@ -23,7 +23,7 @@ export function InlineDeleteButton({
       onClick={onClick}
       aria-label={ariaLabel ?? 'Delete item'}
       className={cn(
-        'h-7 w-7 p-0 text-muted-foreground hover:text-destructive',
+        'h-7 w-7 p-0 text-muted-foreground hover:text-destructive bg-white',
         className
       )}>
       <Trash className='h-4 w-4 text-red-400' />

@@ -210,26 +210,38 @@ export function ImageUploadDialog({
   }, [isUploading, onOpenChange])
 
   const handlePasteUrl = useCallback(() => {
-    if (!urlInput.trim()) {
+    const trimmedUrl = urlInput.trim()
+
+    if (!trimmedUrl) {
       setError('Please enter a valid URL')
       return
     }
 
     try {
-      const url = new URL(urlInput.trim())
-      if (!url.protocol.startsWith('http')) {
+      const url = new URL(trimmedUrl)
+      if (url.protocol !== 'http:' && url.protocol !== 'https:') {
         setError('URL must start with http:// or https://')
         return
       }
 
       setError(null)
-      onUpload(urlInput.trim())
+      onUpload(trimmedUrl)
       setUrlInput('')
       onOpenChange(false)
     } catch {
       setError('Please enter a valid URL')
     }
   }, [urlInput, onUpload, onOpenChange])
+
+  const isValidImageUrl = useCallback((url: string): boolean => {
+    if (!url.trim()) return false
+    try {
+      const urlObj = new URL(url.trim())
+      return urlObj.protocol === 'http:' || urlObj.protocol === 'https:'
+    } catch {
+      return false
+    }
+  }, [])
 
   const handleCopyExistingUrl = useCallback(async () => {
     if (existingUrl) {
@@ -387,7 +399,10 @@ export function ImageUploadDialog({
                   type='url'
                   placeholder='https://example.com/image.jpg'
                   value={urlInput}
-                  onChange={(e) => setUrlInput(e.target.value)}
+                  onChange={(e) => {
+                    setUrlInput(e.target.value)
+                    if (error) setError(null)
+                  }}
                   onKeyDown={(e) => e.key === 'Enter' && handlePasteUrl()}
                   disabled={isUploading}
                   className='flex-1 truncate max-w-full'
@@ -396,7 +411,7 @@ export function ImageUploadDialog({
                 <Button
                   type='button'
                   onClick={handlePasteUrl}
-                  disabled={isUploading || !urlInput.trim()}>
+                  disabled={isUploading || !isValidImageUrl(urlInput)}>
                   Use URL
                 </Button>
               </div>

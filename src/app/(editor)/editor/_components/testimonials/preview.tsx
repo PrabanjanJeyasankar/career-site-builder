@@ -5,15 +5,18 @@ import type { Testimonial } from '@/types/database'
 import Image from 'next/image'
 import { SectionHeading } from '../section-heading'
 import { TestimonialLayout } from './layout'
+import type { CSSProperties } from 'react'
 
 type TestimonialsPreviewProps = {
   data: Testimonial[]
   device: DeviceType
+  primaryColor?: string
 }
 
 export function TestimonialsPreview({
   data,
   device,
+  primaryColor,
 }: TestimonialsPreviewProps) {
   const sizes = {
     mobile: {
@@ -54,8 +57,14 @@ export function TestimonialsPreview({
     },
   }[device]
 
+  const sectionStyle = primaryColor
+    ? ({ ['--primary' as string]: primaryColor } as CSSProperties)
+    : undefined
+
   return (
-    <section className={`w-full bg-background ${sizes.section}`}>
+    <section
+      className={`w-full bg-background ${sizes.section}`}
+      style={sectionStyle}>
       <div className='mx-auto max-w-6xl px-4'>
         <div className='mb-16 flex items-baseline justify-between gap-4'>
           <SectionHeading
@@ -73,7 +82,13 @@ export function TestimonialsPreview({
             const firstInitial = name.charAt(0).toUpperCase()
 
             const avatarTile = (
-              <div className='relative h-20 w-20 overflow-hidden rounded-3xl bg-chart-1/15'>
+              <div
+                className='relative h-20 w-20 overflow-hidden rounded-3xl bg-primary/10'
+                style={
+                  primaryColor
+                    ? ({ ['--primary' as string]: primaryColor } as CSSProperties)
+                    : undefined
+                }>
                 {testimonial.avatar_url ? (
                   <Image
                     src={testimonial.avatar_url}

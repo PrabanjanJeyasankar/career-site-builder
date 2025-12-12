@@ -263,7 +263,7 @@ export function ValueItemsEditor({
                 }
                 title={titleNode}
                 description={descriptionNode}
-                tileBgClass='bg-chart-1/10'
+                tileBgClass='bg-chart-1/5'
                 iconBgClass='bg-chart-1/15'
                 iconTextClass='text-chart-1'
                 tileBgColor={secondaryColor || primaryColor}

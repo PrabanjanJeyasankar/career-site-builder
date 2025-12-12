@@ -242,7 +242,7 @@ export function PerksEditor({
                 onIconClick={() => openIconDialog(perk.id, perk.icon || '')}
                 title={titleNode}
                 description={descriptionNode}
-                tileBgClass='bg-chart-2/10'
+                tileBgClass='bg-chart-2/5'
                 iconBgClass='bg-chart-2/15'
                 iconTextClass='text-chart-2'
                 className='pt-4'
