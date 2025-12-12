@@ -7,12 +7,13 @@ import {
   getJobsByCompanyId,
   getLifeSectionByCompanyId,
   getLocationsByCompanyId,
-  getSectionOrderByCompanyId,
   getPerksByCompanyId,
+  getSectionOrderByCompanyId,
   getTestimonialsByCompanyId,
   getValueItemsByCompanyId,
 } from '@/lib/db/fetchSectionData'
 import type { LifeSection } from '@/types/database'
+import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
 type PreviewPageProps = {
@@ -20,6 +21,41 @@ type PreviewPageProps = {
     companyId: string
   }>
 }
+
+export async function generateMetadata({
+  params,
+}: PreviewPageProps): Promise<Metadata> {
+  const { companyId } = await params
+
+  const [companyNameResult, profileResult] = await Promise.allSettled([
+    getCompanyNameById(companyId),
+    getCompanyProfileByCompanyId(companyId),
+  ])
+
+  const companyName =
+    companyNameResult.status === 'fulfilled' && companyNameResult.value
+      ? companyNameResult.value
+      : null
+
+  const rawFavicon =
+    profileResult.status === 'fulfilled'
+      ? profileResult.value?.favicon_url
+      : undefined
+  const faviconUrl = rawFavicon?.trim() || undefined
+
+  return {
+    title: companyName ? `Careers at ${companyName}` : 'Careers',
+    icons: faviconUrl
+      ? {
+          icon: faviconUrl,
+        }
+      : undefined,
+  }
+}
+
+// Preview must remain dynamic to reflect company-specific metadata/assets.
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 export default async function PreviewPage({ params }: PreviewPageProps) {
   const { companyId } = await params

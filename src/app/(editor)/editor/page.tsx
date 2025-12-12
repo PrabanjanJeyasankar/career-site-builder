@@ -4,14 +4,19 @@ import {
   type HeroEditorInitialData,
 } from './_components/editor-page-client'
 
-import { getCurrentCompanyName, getCurrentUserCompanyId } from '@/lib/db/company'
+export const dynamic = 'force-dynamic'
+
+import {
+  getCurrentCompanyName,
+  getCurrentUserCompanyId,
+} from '@/lib/db/company'
 import {
   getCompanyProfileForCurrentCompany,
   getJobsForCurrentCompany,
   getLifeSectionForCurrentCompany,
   getLocationsForCurrentCompany,
-  getSectionOrderForCurrentCompany,
   getPerksForCurrentCompany,
+  getSectionOrderForCurrentCompany,
   getTestimonialsForCurrentCompany,
   getValueItemsForCurrentCompany,
 } from '@/lib/db/fetchSectionData'

@@ -1,5 +1,7 @@
 import { AlertTriangle, Palette } from 'lucide-react'
 
+export const dynamic = 'force-dynamic'
+
 import { BrandAssetsForm } from './_components/BrandAssetsForm'
 
 import { getCurrentCompanyName } from '@/lib/db/company'
