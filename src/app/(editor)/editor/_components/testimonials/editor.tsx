@@ -1,15 +1,5 @@
 'use client'
 
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import {
   createTestimonialInline,
@@ -20,6 +10,7 @@ import type { Testimonial } from '@/types/database'
 import { Plus, Replace } from 'lucide-react'
 import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
+import { ImageUploadDialog } from '@/components/common/ImageUploadDialog'
 import { InlineDeleteButton } from '../inline-delete-button'
 import { SectionHeading } from '../section-heading'
 import { TestimonialLayout } from './layout'
@@ -39,11 +30,10 @@ export function TestimonialsEditor({ initial }: EditorProps) {
   const roleRef = useRef<HTMLInputElement | null>(null)
   const quoteRef = useRef<HTMLTextAreaElement | null>(null)
 
-  const [dialogOpen, setDialogOpen] = useState(false)
-  const [dialogUrl, setDialogUrl] = useState('')
-  const [dialogTestimonialId, setDialogTestimonialId] = useState<string | null>(
-    null
-  )
+  const [avatarDialogOpen, setAvatarDialogOpen] = useState(false)
+  const [avatarDialogTestimonialId, setAvatarDialogTestimonialId] = useState<
+    string | null
+  >(null)
 
   async function save(id: string, patch: Partial<Testimonial>) {
     // Find the current testimonial to get required fields
@@ -97,22 +87,22 @@ export function TestimonialsEditor({ initial }: EditorProps) {
     }
   }
 
-  async function saveAvatar() {
-    if (!dialogTestimonialId) return
+  async function saveAvatar(url: string) {
+    if (!avatarDialogTestimonialId) return
 
     const nextTestimonials = testimonials.map((t) =>
-      t.id === dialogTestimonialId ? { ...t, avatar_url: dialogUrl } : t
+      t.id === avatarDialogTestimonialId ? { ...t, avatar_url: url } : t
     )
     setTestimonials(nextTestimonials)
 
-    await save(dialogTestimonialId, { avatar_url: dialogUrl })
-    setDialogOpen(false)
+    await save(avatarDialogTestimonialId, { avatar_url: url })
+    setAvatarDialogOpen(false)
+    setAvatarDialogTestimonialId(null)
   }
 
-  function openAvatarDialog(testimonialId: string, currentUrl: string) {
-    setDialogTestimonialId(testimonialId)
-    setDialogUrl(currentUrl || '')
-    setDialogOpen(true)
+  function openAvatarDialog(testimonialId: string) {
+    setAvatarDialogTestimonialId(testimonialId)
+    setAvatarDialogOpen(true)
   }
 
   useEffect(() => {
@@ -164,7 +154,7 @@ export function TestimonialsEditor({ initial }: EditorProps) {
               <div
                 className='group/avatar relative h-20 w-20 cursor-pointer overflow-hidden rounded-3xl bg-chart-1/15'
                 onClick={() =>
-                  openAvatarDialog(testimonial.id, testimonial.avatar_url || '')
+                  openAvatarDialog(testimonial.id)
                 }>
                 {testimonial.avatar_url ? (
                   <Image
@@ -349,28 +339,23 @@ export function TestimonialsEditor({ initial }: EditorProps) {
         </div>
       </div>
 
-      <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Replace Avatar</AlertDialogTitle>
-            <AlertDialogDescription>
-              Paste a public image URL for the employee avatar.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-
-          <input
-            value={dialogUrl}
-            onChange={(e) => setDialogUrl(e.target.value)}
-            className='mt-4 w-full rounded border p-2 outline-none'
-            placeholder='https://example.com/avatar.jpg'
-          />
-
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={saveAvatar}>Save</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ImageUploadDialog
+        open={avatarDialogOpen}
+        onOpenChange={(open) => {
+          if (!open) setAvatarDialogTestimonialId(null)
+          setAvatarDialogOpen(open)
+        }}
+        onUpload={saveAvatar}
+        existingUrl={
+          avatarDialogTestimonialId
+            ? testimonials.find((t) => t.id === avatarDialogTestimonialId)
+                ?.avatar_url ?? undefined
+            : undefined
+        }
+        title='Upload avatar'
+        description='Upload a square photo or paste an image URL.'
+        allowedFormats={['image/jpeg', 'image/png', 'image/webp']}
+      />
     </section>
   )
 }
