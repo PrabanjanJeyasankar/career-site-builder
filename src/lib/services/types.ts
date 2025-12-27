@@ -64,7 +64,6 @@ export type ColorExtractionResult = {
 }
 
 export type ScraperConfig = {
-  token: string
   timeout?: number
 }
 

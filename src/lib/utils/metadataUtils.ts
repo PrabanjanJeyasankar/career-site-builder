@@ -37,15 +37,12 @@ export function buildHeuristicProfile(
     pickMetaString(meta.title) ||
     pickMetaString(meta['twitter:title']) ||
     jsonLdPrimary?.name ||
-    'Your Company'
-
-  const fallbackDescription =
-    'We build products with care for people and business.'
+    ''
   const description =
     pickMetaString(meta['og:description']) ||
     pickMetaString(meta.description) ||
     pickMetaString(meta['twitter:description']) ||
-    fallbackDescription
+    ''
 
   const logo =
     pickMetaString(jsonLdPrimary?.logo) ||
@@ -64,15 +61,13 @@ export function buildHeuristicProfile(
   const h2Secondary = raw.allH2s?.[1] || ''
 
   const heroTitle = h1 || title
-  const heroSubtitle =
-    h2Primary || h2Secondary || 'Join our team and make an impact'
-  const heroDescription =
-    description || 'Explore opportunities to grow your career with us.'
+  const heroSubtitle = h2Primary || h2Secondary || ''
+  const heroDescription = description || ''
 
   return ensureCompleteProfile({
     company_name: cleanText(title),
-    tagline: cleanText((description ?? fallbackDescription).slice(0, 80)),
-    description: cleanText(description ?? fallbackDescription),
+    tagline: cleanText(description.slice(0, 80)),
+    description: cleanText(description),
     favicon_url: favicon,
     logo_url: logo || bestImageUrl || '',
     social_preview_url: social || bestImageUrl || '',
@@ -82,37 +77,29 @@ export function buildHeuristicProfile(
     hero_subtitle: cleanText(heroSubtitle),
     hero_description: cleanText(heroDescription),
     hero_background_url: social || bestImageUrl || '',
-    cta_label: 'View roles',
+    cta_label: '',
   })
 }
 
 export function ensureCompleteProfile(
   input: Partial<CompanyInfo>
 ): CompanyInfo {
-  const fallback: CompanyInfo = {
-    company_name: 'Your Company',
-    tagline: 'Build what matters',
-    description:
-      'We create thoughtful products with a focus on impact and people.',
-    favicon_url: '',
-    logo_url: '',
-    social_preview_url: '',
-    primary_color: '#5038EE',
-    secondary_color: '#F5F5F5',
-    hero_title: 'Careers at Your Company',
-    hero_subtitle: 'Join a team that values craft, collaboration, and impact.',
-    hero_description:
-      'We are hiring builders and problem-solvers who want to make a difference together.',
-    hero_background_url: 'Abstract gradient inspired by brand colors',
-    cta_label: 'View roles',
-  }
-
   const merged: CompanyInfo = {
-    ...fallback,
-    ...input,
-    primary_color: normalizeHex(input.primary_color) ?? fallback.primary_color,
+    company_name: input.company_name ?? '',
+    tagline: input.tagline ?? '',
+    description: input.description ?? '',
+    favicon_url: input.favicon_url ?? '',
+    logo_url: input.logo_url ?? '',
+    social_preview_url: input.social_preview_url ?? '',
+    primary_color:
+      normalizeHex(input.primary_color) ?? input.primary_color ?? '',
     secondary_color:
-      normalizeHex(input.secondary_color) ?? fallback.secondary_color,
+      normalizeHex(input.secondary_color) ?? input.secondary_color ?? '',
+    hero_title: input.hero_title ?? '',
+    hero_subtitle: input.hero_subtitle ?? '',
+    hero_description: input.hero_description ?? '',
+    hero_background_url: input.hero_background_url ?? '',
+    cta_label: input.cta_label ?? '',
   }
 
   merged.company_name = cleanText(merged.company_name)

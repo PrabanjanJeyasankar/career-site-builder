@@ -84,12 +84,12 @@ export function ValuePerkPreviewCard({
         </div>
       </div>
 
-      <div className='mt-5 flex w-full flex-1 items-center justify-center'>
+      <div className='mt-5 flex w-full flex-1 items-center justify-center '>
         <p
           className={cn(
             descriptionClassName,
             descriptionWidthClass,
-            'w-full text-balance leading-relaxed text-muted-foreground text-center md:text-left'
+            'w-full text-center leading-relaxed text-muted-foreground'
           )}>
           {description || descriptionPlaceholder}
         </p>

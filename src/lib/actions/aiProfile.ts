@@ -9,7 +9,7 @@ import {
   normalizeLLMProvider,
 } from '@/lib/services/aiRefinementService'
 import { ImaggaColorExtractionService } from '@/lib/services/colorExtractionService'
-import { ApifyMetadataScraperService } from '@/lib/services/metadataScraperService'
+import { PuppeteerMetadataScraperService } from '@/lib/services/metadataScraperService'
 import { selectBestImage } from '@/lib/utils/metadataUtils'
 
 export async function fetchCompanyProfileFromUrl(url: string): Promise<{
@@ -29,13 +29,8 @@ export async function fetchCompanyProfileFromUrl(url: string): Promise<{
     logs.push({ step: 'start', info: 'Pipeline started', meta: { url } })
     console.log('aiProfile: pipeline started', { url })
 
-    const apifyToken = process.env.APIFY_TOKEN
-    if (!apifyToken) {
-      throw new Error('Missing APIFY_TOKEN environment variable')
-    }
-
-    const scraperService = new ApifyMetadataScraperService(
-      { token: apifyToken, timeout: 90000 },
+    const scraperService = new PuppeteerMetadataScraperService(
+      { timeout: 90000 },
       logs
     )
 

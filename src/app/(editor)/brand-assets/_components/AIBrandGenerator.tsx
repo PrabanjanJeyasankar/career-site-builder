@@ -78,8 +78,6 @@ export function AIBrandGenerator({
         </Button>
       </div>
 
-      {error && <p className='mt-3 text-xs text-destructive'>{error}</p>}
-
       {isPending && currentStep !== 'idle' && currentStep !== 'complete' && (
         <div className='mt-3 flex items-center gap-2 rounded-md bg-primary/5 px-3 py-2 text-sm font-medium text-primary'>
           <Loader2 className='size-4 animate-spin' />
